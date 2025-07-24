@@ -16,6 +16,8 @@ class ProgramApplication extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
+    public $timestamps = false;
+
     const UPDATED_AT = null;
 
     protected $fillable = [

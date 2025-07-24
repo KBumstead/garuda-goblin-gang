@@ -13,11 +13,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            RoleSeeder::class,
+            UserSeeder::class,
+            SchoolSeeder::class,
+            ClubSeeder::class,
+            PlayerSeeder::class,
+            TrainerSeeder::class,
+            TournamentSeeder::class,
+            MatchSeeder::class,
+            TrainingProgramSeeder::class,
         ]);
+        // TODO: Add demo data for schools, clubs, players, trainers, tournaments, matches, training programs
     }
 }
