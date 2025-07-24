@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Eye, EyeOff } from 'lucide-react';
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader } from "./ui/card";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Eye, EyeOff } from "lucide-react";
 
 interface LoginProps {
   onLogin: (email: string, password: string) => void;
@@ -11,9 +11,13 @@ interface LoginProps {
   onForgotPassword: () => void;
 }
 
-export function Login({ onLogin, onNavigateToSignUp, onForgotPassword }: LoginProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export function Login({
+  onLogin,
+  onNavigateToSignUp,
+  onForgotPassword,
+}: LoginProps) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,13 +41,18 @@ export function Login({ onLogin, onNavigateToSignUp, onForgotPassword }: LoginPr
         <CardHeader className="text-center pb-2">
           {/* Logo */}
           <div className="flex items-center justify-center space-x-3 mb-6">
-            <span className="text-[#1b1b1e] font-bold text-2xl">PickUp</span>
+            <div className="w-10 h-10 bg-[#f46036] rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">B</span>
+            </div>
+            <span className="text-[#1b1b1e] font-bold text-2xl">PickUps</span>
           </div>
-          
+
           {/* Header */}
-          <h1 className="text-2xl font-bold text-[#1b1b1e] mb-2">Welcome Back</h1>
+          <h1 className="text-2xl font-bold text-[#1b1b1e] mb-2">
+            Welcome Back
+          </h1>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
@@ -70,7 +79,7 @@ export function Login({ onLogin, onNavigateToSignUp, onForgotPassword }: LoginPr
               <div className="relative">
                 <Input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -108,13 +117,13 @@ export function Login({ onLogin, onNavigateToSignUp, onForgotPassword }: LoginPr
               disabled={!isFormValid || isLoading}
               className="w-full bg-[#f46036] hover:bg-[#f46036]/90 text-white font-medium py-3"
             >
-              {isLoading ? 'Logging In...' : 'Log In'}
+              {isLoading ? "Logging In..." : "Log In"}
             </Button>
 
             {/* Sign Up Link */}
             <div className="text-center">
               <p className="text-[#6d676e]">
-                Don't have an account?{' '}
+                Don't have an account?{" "}
                 <button
                   type="button"
                   onClick={onNavigateToSignUp}
