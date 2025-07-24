@@ -71,11 +71,11 @@ export function PlayerProfile({ onBack, player, userRole }: PlayerProfileProps) 
 
   return (
     <div className="p-8 space-y-6">
-      <div className="flex items-center space-x-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
         <Button 
           variant="outline" 
           onClick={onBack}
-          className="bg-[#fbfffe] border-[#6d676e] hover:bg-[#6d676e]/10"
+          className="bg-[#fbfffe] border-[#6d676e] hover:bg-[#6d676e]/10 transition-colors focus:ring-2 focus:ring-[#f46036] rounded"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Database
@@ -86,7 +86,7 @@ export function PlayerProfile({ onBack, player, userRole }: PlayerProfileProps) 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Side - Player Info */}
         <div className="lg:col-span-1">
-          <Card className="bg-[#fbfffe] border-[#6d676e]/20">
+          <Card className="bg-[#fbfffe] border-[#6d676e]/20 rounded-xl shadow-sm hover:shadow-lg transition-shadow">
             <CardHeader className="text-center">
               <Avatar className="w-32 h-32 mx-auto">
                 <AvatarImage src={p.avatar} alt={p.name} />
@@ -149,15 +149,11 @@ export function PlayerProfile({ onBack, player, userRole }: PlayerProfileProps) 
 
         {/* Right Side - Tabs */}
         <div className="lg:col-span-2">
-          <Card className="bg-[#fbfffe] border-[#6d676e]/20">
+          <Card className="bg-[#fbfffe] border-[#6d676e]/20 rounded-xl shadow-sm hover:shadow-lg transition-shadow">
             <Tabs defaultValue="review" className="w-full">
               <TabsList className="grid w-full grid-cols-2 bg-[#6d676e]/10">
-                <TabsTrigger value="review" className="data-[state=active]:bg-[#f46036] data-[state=active]:text-white">
-                  Add Review & Ranking
-                </TabsTrigger>
-                <TabsTrigger value="history" className="data-[state=active]:bg-[#f46036] data-[state=active]:text-white">
-                  Match History
-                </TabsTrigger>
+                <TabsTrigger value="review" className="data-[state=active]:bg-[#f46036] data-[state=active]:text-white transition-colors">Add Review & Ranking</TabsTrigger>
+                <TabsTrigger value="history" className="data-[state=active]:bg-[#f46036] data-[state=active]:text-white transition-colors">Match History</TabsTrigger>
               </TabsList>
               
               <TabsContent value="review" className="p-6 space-y-6">
@@ -200,34 +196,30 @@ export function PlayerProfile({ onBack, player, userRole }: PlayerProfileProps) 
                 {userRole !== 'user' && (
                   <Button 
                     onClick={handleSubmitReview}
-                    className="w-full bg-[#f46036] hover:bg-[#f46036]/90 text-white font-medium"
+                    className="w-full bg-[#f46036] hover:bg-[#f46036]/90 text-white font-medium transition-colors focus:ring-2 focus:ring-[#f46036] rounded"
                   >
                     Submit Review
                   </Button>
                 )}
               </TabsContent>
               
-              <TabsContent value="history" className="p-6">
+              <TabsContent value="history" className="p-6 space-y-6">
                 <h3 className="text-lg font-semibold text-[#1b1b1e] mb-4">Recent Matches</h3>
-                <div className="space-y-4">
-                  {(p.matchHistory || []).map((match: any) => (
-                    <div key={match.id} className="border border-[#6d676e]/20 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="w-4 h-4 text-[#6d676e]" />
-                          <span className="text-sm text-[#6d676e]">{match.date}</span>
+                {p.matchHistory && p.matchHistory.length > 0 ? (
+                  <ul className="space-y-4">
+                    {p.matchHistory.map((match: any) => (
+                      <li key={match.id} className="bg-[#f46036]/5 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between">
+                        <div className="flex-1">
+                          <div className="font-semibold text-[#1b1b1e]">{match.opponent}</div>
+                          <div className="text-[#6d676e] text-sm">{match.date} &bull; {match.score}</div>
                         </div>
-                        <Badge variant="outline" className="text-[#1b1b1e]">
-                          {match.score}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-[#1b1b1e]">vs {match.opponent}</span>
-                        <span className="text-sm text-[#6d676e]">{match.performance}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                        <div className="text-[#f46036] font-bold text-sm mt-2 sm:mt-0">{match.performance}</div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-center text-[#6d676e] py-8 text-lg">No match history available.</div>
+                )}
               </TabsContent>
             </Tabs>
           </Card>

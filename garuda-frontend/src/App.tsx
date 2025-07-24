@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { Login } from "./components/Login";
@@ -22,27 +22,35 @@ import { ProfileManagement } from "./components/ProfileManagement";
 type AuthView = "login" | "scout-registration" | "forgot-password";
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Restore auth state from localStorage
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
   const [authView, setAuthView] = useState<AuthView>("login");
   const [activeScreen, setActiveScreen] = useState("dashboard");
-  const [userRole, setUserRole] = useState<"user" | "scout" | "trainer">(
-    "user"
-  );
+  const [userRole, setUserRole] = useState<"user" | "scout" | "trainer">(() => {
+    return (localStorage.getItem('userRole') as "user" | "scout" | "trainer") || "user";
+  });
   const [showPlayerProfile, setShowPlayerProfile] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    localStorage.setItem('isAuthenticated', String(isAuthenticated));
+    localStorage.setItem('userRole', userRole);
+  }, [isAuthenticated, userRole]);
+
   const handleLogin = (email: string, password: string) => {
     setIsAuthenticated(true);
-
-    // Set user role based on email domain or backend response
+    let role: "user" | "scout" | "trainer" = "user";
     if (email.includes("scout") || email.includes("media")) {
-      setUserRole("scout");
+      role = "scout";
     } else if (email.includes("trainer") || email.includes("coach")) {
-      setUserRole("trainer");
-    } else {
-      setUserRole("user");
+      role = "trainer";
     }
+    setUserRole(role);
+    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem('userRole', role);
     navigate("/");
   };
 
@@ -55,9 +63,12 @@ export default function App() {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    setUserRole("user");
     setActiveScreen("dashboard");
     setShowPlayerProfile(false);
     setAuthView("login");
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userRole');
     navigate("/login");
   };
 
@@ -75,6 +86,7 @@ export default function App() {
     setUserRole(role);
     setActiveScreen("dashboard");
     setShowPlayerProfile(false);
+    localStorage.setItem('userRole', role);
     navigate("/");
   };
 
@@ -130,7 +142,7 @@ export default function App() {
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}
-              allowedRoles={["player", "scout"]}
+              allowedRoles={["user", "scout", "trainer"]}
               userRole={userRole}
             >
               <div className="p-8 space-y-6">
@@ -204,7 +216,7 @@ export default function App() {
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}
-              allowedRoles={["player", "scout"]}
+              allowedRoles={["user", "scout", "trainer"]}
               userRole={userRole}
             >
               <PlayerRankings />
@@ -216,7 +228,7 @@ export default function App() {
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}
-              allowedRoles={["player", "scout"]}
+              allowedRoles={["user", "scout", "trainer"]}
               userRole={userRole}
             >
               <div className="p-8">
@@ -235,7 +247,7 @@ export default function App() {
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}
-              allowedRoles={["player", "scout"]}
+              allowedRoles={["user", "scout", "trainer"]}
               userRole={userRole}
             >
               <TrainingPrograms />
@@ -247,7 +259,7 @@ export default function App() {
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}
-              allowedRoles={["player", "scout"]}
+              allowedRoles={["user", "scout", "trainer"]}
               userRole={userRole}
             >
               <Clubs />
@@ -341,7 +353,7 @@ export default function App() {
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}
-              allowedRoles={["player", "scout"]}
+              allowedRoles={["user", "scout"]}
               userRole={userRole}
             >
               <div className="p-8">

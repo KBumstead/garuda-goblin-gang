@@ -197,7 +197,7 @@ export function PlayerRankings({ onPlayerClick, userRole, enableSearch }: Player
         </div>
       </div>
 
-      <Card className="bg-[#fbfffe] border-[#6d676e]/20">
+      <Card className="bg-[#fbfffe] border-[#6d676e]/20 rounded-xl shadow-sm hover:shadow-lg transition-shadow">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[700px] sm:min-w-[900px]">
             <thead>
@@ -213,46 +213,52 @@ export function PlayerRankings({ onPlayerClick, userRole, enableSearch }: Player
               </tr>
             </thead>
             <tbody>
-              {filteredPlayers.map((player, idx) => (
-                <tr key={player.id} className="border-b border-[#6d676e]/10 hover:bg-[#f46036]/10 transition-colors duration-200">
-                  <td className="p-2 sm:p-4">
-                    <div className="flex items-center justify-center w-8 h-8 bg-[#f46036] text-white rounded-full font-bold">
-                      {idx + 1}
-                    </div>
-                  </td>
-                  <td className="p-2 sm:p-4">
-                    <div className="flex items-center space-x-2 sm:space-x-3">
-                      <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
-                        <AvatarImage src={player.avatar} alt={player.name} />
-                        <AvatarFallback>{player.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                      </Avatar>
-                      <button
-                        className="font-medium text-[#1b1b1e] hover:underline focus:outline-none transition-colors duration-150"
-                        style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer' }}
-                        onClick={() => onPlayerClick && onPlayerClick(player)}
-                      >
-                        {player.name}
-                      </button>
-                    </div>
-                  </td>
-                  <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.school}</td>
-                  <td className="p-2 sm:p-4">
-                    <Badge variant="secondary" className="bg-[#6d676e]/10 text-[#1b1b1e]">
-                      {player.position}
-                    </Badge>
-                  </td>
-                  <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.age}</td>
-                  <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.gender}</td>
-                  <td className="p-2 sm:p-4 text-[#1b1b1e] font-medium">
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <span key={i} style={{ color: i < (player.rating || 3) ? '#f46036' : '#e0e0e0', fontSize: '1.1em', transition: 'color 0.2s' }}>
-                        ★
-                      </span>
-                    ))}
-                  </td>
-                  <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.region}</td>
+              {filteredPlayers.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="text-center py-8 text-[#6d676e] text-lg">No players found. Try adjusting your filters or search.</td>
                 </tr>
-              ))}
+              ) : (
+                filteredPlayers.map((player, idx) => (
+                  <tr key={player.id} className="border-b border-[#6d676e]/10 hover:bg-[#f46036]/10 transition-colors duration-200">
+                    <td className="p-2 sm:p-4">
+                      <div className="flex items-center justify-center w-8 h-8 bg-[#f46036] text-white rounded-full font-bold">
+                        {idx + 1}
+                      </div>
+                    </td>
+                    <td className="p-2 sm:p-4">
+                      <div className="flex items-center space-x-2 sm:space-x-3">
+                        <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
+                          <AvatarImage src={player.avatar} alt={player.name} />
+                          <AvatarFallback>{player.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <button
+                          className="font-medium text-[#1b1b1e] hover:underline focus:outline-none transition-colors duration-150 focus:ring-2 focus:ring-[#f46036] rounded"
+                          style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer' }}
+                          onClick={() => onPlayerClick && onPlayerClick(player)}
+                        >
+                          {player.name}
+                        </button>
+                      </div>
+                    </td>
+                    <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.school}</td>
+                    <td className="p-2 sm:p-4">
+                      <Badge variant="secondary" className="bg-[#6d676e]/10 text-[#1b1b1e]">
+                        {player.position}
+                      </Badge>
+                    </td>
+                    <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.age}</td>
+                    <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.gender}</td>
+                    <td className="p-2 sm:p-4 text-[#1b1b1e] font-medium">
+                      {Array.from({ length: 5 }, (_, i) => (
+                        <span key={i} style={{ color: i < (player.rating || 3) ? '#f46036' : '#e0e0e0', fontSize: '1.1em', transition: 'color 0.2s' }}>
+                          ★
+                        </span>
+                      ))}
+                    </td>
+                    <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.region}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
