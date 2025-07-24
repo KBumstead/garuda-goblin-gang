@@ -7,6 +7,7 @@ import { TrainingPrograms } from './components/TrainingPrograms';
 import { Clubs } from './components/Clubs';
 import { PlayerProfile } from './components/PlayerProfile';
 import { AddMatchReview } from './components/AddMatchReview';
+import { ProfileManagement } from './components/ProfileManagement';
 
 type AuthView = 'login' | 'scout-registration' | 'forgot-password';
 
@@ -14,8 +15,9 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authView, setAuthView] = useState<AuthView>('login');
   const [activeScreen, setActiveScreen] = useState('dashboard');
-  const [userRole, setUserRole] = useState<'player' | 'scout'>('player');
+  const [userRole, setUserRole] = useState<'user' | 'scout' | 'trainer'>('user');
   const [showPlayerProfile, setShowPlayerProfile] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
 
   const handleLogin = (email: string, password: string) => {
     console.log('Login attempt:', { email, password });
@@ -25,8 +27,10 @@ export default function App() {
     // Set user role based on email domain or backend response
     if (email.includes('scout') || email.includes('media')) {
       setUserRole('scout');
+    } else if (email.includes('trainer') || email.includes('coach')) {
+      setUserRole('trainer');
     } else {
-      setUserRole('player');
+      setUserRole('user');
     }
   };
 
@@ -54,13 +58,14 @@ export default function App() {
     setShowPlayerProfile(false);
   };
 
-  const handleRoleChange = (role: 'player' | 'scout') => {
+  const handleRoleChange = (role: 'user' | 'scout' | 'trainer') => {
     setUserRole(role);
     setActiveScreen('dashboard');
     setShowPlayerProfile(false);
   };
 
-  const handlePlayerClick = () => {
+  const handlePlayerClick = (player: any) => {
+    setSelectedPlayer(player);
     setShowPlayerProfile(true);
   };
 
@@ -102,7 +107,7 @@ export default function App() {
   const renderScreen = () => {
     // Show player profile if requested (scout view)
     if (showPlayerProfile) {
-      return <PlayerProfile onBack={() => setShowPlayerProfile(false)} />;
+      return <PlayerProfile onBack={() => setShowPlayerProfile(false)} player={selectedPlayer} userRole={userRole} />;
     }
 
     switch (activeScreen) {
@@ -111,7 +116,7 @@ export default function App() {
           <div className="p-8 space-y-6">
             <div className="flex items-center justify-between">
               <h1 className="text-3xl font-bold text-[#fbfffe]">
-                Welcome to BasketIndo
+                Welcome to PickUp
               </h1>
               <button
                 onClick={handleLogout}
@@ -137,23 +142,73 @@ export default function App() {
                 <p className="text-[#6d676e] text-sm">Clubs to join</p>
               </div>
             </div>
+            {/* Previews for Player and School Rankings */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Player Rankings Preview */}
+              <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20">
+                <h3 className="text-xl font-semibold text-[#1b1b1e] mb-4 flex items-center justify-between">
+                  Player Rankings
+                  <button className="text-[#f46036] text-sm font-medium hover:underline" onClick={() => setActiveScreen('player-rankings')}>View All</button>
+                </h3>
+                <ul className="divide-y divide-[#6d676e]/10">
+                  <li className="py-2 flex items-center justify-between">
+                    <span className="font-medium text-[#1b1b1e]">1. Ahmad Rizki</span>
+                    <span className="text-[#6d676e] text-sm">SMA Jakarta Utara</span>
+                  </li>
+                  <li className="py-2 flex items-center justify-between">
+                    <span className="font-medium text-[#1b1b1e]">2. Budi Santoso</span>
+                    <span className="text-[#6d676e] text-sm">SMA Bandung Raya</span>
+                  </li>
+                  <li className="py-2 flex items-center justify-between">
+                    <span className="font-medium text-[#1b1b1e]">3. Charles Wijaya</span>
+                    <span className="text-[#6d676e] text-sm">SMA Surabaya</span>
+                  </li>
+                </ul>
+              </div>
+              {/* School Rankings Preview */}
+              <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20">
+                <h3 className="text-xl font-semibold text-[#1b1b1e] mb-4 flex items-center justify-between">
+                  School Rankings
+                  <button className="text-[#f46036] text-sm font-medium hover:underline" onClick={() => setActiveScreen('school-rankings')}>View All</button>
+                </h3>
+                <ul className="divide-y divide-[#6d676e]/10">
+                  <li className="py-2 flex items-center justify-between">
+                    <span className="font-medium text-[#1b1b1e]">1. SMA Jakarta Utara</span>
+                    <span className="text-[#6d676e] text-sm">Jakarta</span>
+                  </li>
+                  <li className="py-2 flex items-center justify-between">
+                    <span className="font-medium text-[#1b1b1e]">2. SMA Bandung Raya</span>
+                    <span className="text-[#6d676e] text-sm">Bandung</span>
+                  </li>
+                  <li className="py-2 flex items-center justify-between">
+                    <span className="font-medium text-[#1b1b1e]">3. SMA Surabaya</span>
+                    <span className="text-[#6d676e] text-sm">Surabaya</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            {/* Upcoming Tournaments News */}
             <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20">
-              <h3 className="text-xl font-semibold text-[#1b1b1e] mb-4">Latest News</h3>
+              <h3 className="text-xl font-semibold text-[#1b1b1e] mb-4">Upcoming Tournaments</h3>
               <div className="space-y-3">
                 <div className="border-l-4 border-[#f46036] pl-4">
-                  <p className="font-medium text-[#1b1b1e]">National Basketball Championship 2024 Registration Open</p>
-                  <p className="text-sm text-[#6d676e]">Registration for the biggest high school tournament is now open</p>
+                  <p className="font-medium text-[#1b1b1e]">High School Basketball Invitational 2024</p>
+                  <p className="text-sm text-[#6d676e]">Starts July 15, 2024 - Jakarta</p>
                 </div>
                 <div className="border-l-4 border-[#f46036] pl-4">
-                  <p className="font-medium text-[#1b1b1e]">New Training Facility Opens in Jakarta</p>
-                  <p className="text-sm text-[#6d676e]">State-of-the-art basketball training center now accepting members</p>
+                  <p className="font-medium text-[#1b1b1e]">National Youth Cup</p>
+                  <p className="text-sm text-[#6d676e]">Qualifiers begin August 1, 2024 - Bandung, Surabaya, Medan</p>
+                </div>
+                <div className="border-l-4 border-[#f46036] pl-4">
+                  <p className="font-medium text-[#1b1b1e]">Regional 3x3 Challenge</p>
+                  <p className="text-sm text-[#6d676e]">September 2024 - Multiple Cities</p>
                 </div>
               </div>
             </div>
           </div>
         );
       case 'player-rankings':
-        return <PlayerRankings />;
+        return <PlayerRankings onPlayerClick={handlePlayerClick} />;
       case 'school-rankings':
         return (
           <div className="p-8">
@@ -162,32 +217,11 @@ export default function App() {
           </div>
         );
       case 'training-programs':
-        return <TrainingPrograms />;
+        return <TrainingPrograms userRole={userRole} />;
       case 'clubs':
         return <Clubs />;
       case 'player-database':
-        return (
-          <div className="p-8 space-y-6">
-            <h1 className="text-3xl font-bold text-[#fbfffe]">Player Database</h1>
-            <div className="bg-[#fbfffe] rounded-lg border border-[#6d676e]/20 p-4">
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div 
-                    key={i}
-                    onClick={handlePlayerClick}
-                    className="flex items-center justify-between p-4 border border-[#6d676e]/20 rounded-lg hover:bg-[#6d676e]/5 cursor-pointer transition-colors"
-                  >
-                    <div>
-                      <p className="font-medium text-[#1b1b1e]">Player {i}</p>
-                      <p className="text-sm text-[#6d676e]">SMA Jakarta {i}</p>
-                    </div>
-                    <button className="text-[#f46036] hover:text-[#f46036]/80">View Profile</button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
+        return <PlayerRankings onPlayerClick={handlePlayerClick} userRole={userRole} enableSearch={true} />;
       case 'add-match-review':
         return <AddMatchReview />;
       case 'my-reports':
@@ -198,12 +232,7 @@ export default function App() {
           </div>
         );
       case 'profile':
-        return (
-          <div className="p-8">
-            <h1 className="text-3xl font-bold text-[#fbfffe]">Profile</h1>
-            <p className="text-[#6d676e] mt-4">Profile management coming soon...</p>
-          </div>
-        );
+        return <ProfileManagement userRole={userRole} />;
       default:
         return (
           <div className="p-8">

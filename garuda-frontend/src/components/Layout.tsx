@@ -6,12 +6,12 @@ interface LayoutProps {
   children: React.ReactNode;
   activeScreen: string;
   onScreenChange: (screen: string) => void;
-  userRole: 'player' | 'scout';
-  onRoleChange: (role: 'player' | 'scout') => void;
+  userRole: 'user' | 'scout' | 'trainer';
+  onRoleChange: (role: 'user' | 'scout' | 'trainer') => void;
 }
 
 export function Layout({ children, activeScreen, onScreenChange, userRole, onRoleChange }: LayoutProps) {
-  const playerMenuItems = [
+  const userMenuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'player-rankings', label: 'Player Rankings', icon: TrendingUp },
     { id: 'school-rankings', label: 'School Rankings', icon: Users },
@@ -19,7 +19,6 @@ export function Layout({ children, activeScreen, onScreenChange, userRole, onRol
     { id: 'clubs', label: 'Clubs', icon: MapPin },
     { id: 'profile', label: 'Profile', icon: User },
   ];
-
   const scoutMenuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'player-database', label: 'Player Database', icon: Database },
@@ -27,8 +26,14 @@ export function Layout({ children, activeScreen, onScreenChange, userRole, onRol
     { id: 'my-reports', label: 'My Reports', icon: FileText },
     { id: 'profile', label: 'Profile', icon: User },
   ];
+  const trainerMenuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: Home },
+    { id: 'training-programs', label: 'Training Programs', icon: FileText },
+    { id: 'clubs', label: 'Clubs', icon: MapPin },
+    { id: 'profile', label: 'Profile', icon: User },
+  ];
 
-  const menuItems = userRole === 'player' ? playerMenuItems : scoutMenuItems;
+  const menuItems = userRole === 'user' ? userMenuItems : userRole === 'trainer' ? trainerMenuItems : scoutMenuItems;
 
   return (
     <div className="min-h-screen bg-background dark">
@@ -37,10 +42,7 @@ export function Layout({ children, activeScreen, onScreenChange, userRole, onRol
         {/* Logo */}
         <div className="p-6 border-b border-[#6d676e]/20">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-[#f46036] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">B</span>
-            </div>
-            <span className="text-[#fbfffe] font-bold text-lg">BasketIndo</span>
+            <span className="text-[#fbfffe] font-bold text-lg">PickUp</span>
           </div>
         </div>
 
@@ -48,15 +50,15 @@ export function Layout({ children, activeScreen, onScreenChange, userRole, onRol
         <div className="p-4 border-b border-[#6d676e]/20">
           <div className="flex bg-[#6d676e]/20 rounded-lg p-1">
             <button
-              onClick={() => onRoleChange('player')}
+              onClick={() => onRoleChange('user')}
               className={cn(
                 "flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all",
-                userRole === 'player'
+                userRole === 'user'
                   ? "bg-[#f46036] text-white"
                   : "text-[#6d676e] hover:text-[#fbfffe]"
               )}
             >
-              Player
+              User
             </button>
             <button
               onClick={() => onRoleChange('scout')}
@@ -68,6 +70,17 @@ export function Layout({ children, activeScreen, onScreenChange, userRole, onRol
               )}
             >
               Scout
+            </button>
+            <button
+              onClick={() => onRoleChange('trainer')}
+              className={cn(
+                "flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all",
+                userRole === 'trainer'
+                  ? "bg-[#f46036] text-white"
+                  : "text-[#6d676e] hover:text-[#fbfffe]"
+              )}
+            >
+              Trainer
             </button>
           </div>
         </div>

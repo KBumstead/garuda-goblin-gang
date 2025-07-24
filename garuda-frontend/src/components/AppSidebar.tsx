@@ -1,5 +1,7 @@
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from './ui/sidebar'
+
 import { Button } from './ui/button'
+import { LogOut } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { 
   User, 
@@ -21,7 +23,7 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ userRole, activeView, onRoleChange, onViewChange, onLogout }: AppSidebarProps) {
-  const playerMenuItems: MenuItem[] = [
+  const userMenuItems: MenuItem[] = [
     { key: 'dashboard', label: 'Dashboard', icon: User },
     { key: 'rankings', label: 'Player Rankings', icon: Trophy },
     { key: 'training', label: 'Training Programs', icon: Dumbbell },
@@ -36,27 +38,35 @@ export function AppSidebar({ userRole, activeView, onRoleChange, onViewChange, o
     { key: 'profile', label: 'Profile', icon: User },
   ]
 
-  const menuItems = userRole === 'player' ? playerMenuItems : scoutMenuItems
+  const trainerMenuItems: MenuItem[] = [
+    { key: 'dashboard', label: 'Dashboard', icon: User },
+    { key: 'training', label: 'Training Programs', icon: Dumbbell },
+    { key: 'clubs', label: 'Clubs', icon: Users },
+    { key: 'profile', label: 'Profile', icon: User },
+  ];
+
+  const menuItems = userRole === 'user' ? userMenuItems : userRole === 'trainer' ? trainerMenuItems : scoutMenuItems
 
   return (
-    <Sidebar className="border-r border-border">
-      <SidebarContent>
-        <SidebarGroup>
+    <Sidebar className="border-r border-border h-full">
+      <SidebarContent className="flex flex-col h-full">
+        <SidebarGroup className="flex-1 flex flex-col">
           <SidebarGroupLabel className="px-4 py-4">
             <div className="flex items-center gap-2">
               <CircleDot className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold">BasketIndo</span>
+              <span className="text-lg font-bold">PickUp</span>
             </div>
           </SidebarGroupLabel>
-          <SidebarGroupContent>
+          <SidebarGroupContent className="flex-1 flex flex-col">
             <div className="px-4 py-2">
               <Select value={userRole} onValueChange={(value: UserRole) => onRoleChange(value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="player">Player/Viewer</SelectItem>
+                  <SelectItem value="user">User/Viewer</SelectItem>
                   <SelectItem value="scout">Scout/Media</SelectItem>
+                  <SelectItem value="trainer">Trainer/Coach</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -73,8 +83,14 @@ export function AppSidebar({ userRole, activeView, onRoleChange, onViewChange, o
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
-            <div className="px-4 py-2 mt-auto">
-              <Button variant="outline" className="w-full" onClick={onLogout}>
+            <div className="flex-1" />
+            <div className="px-4 py-2">
+              <Button
+                className="w-full flex items-center justify-center gap-2 bg-[#f46036] text-white font-bold py-3 rounded-lg shadow-md hover:bg-[#d94e1f] focus:bg-[#d94e1f] focus:outline-none focus:ring-2 focus:ring-[#f46036]/50 transition"
+                onClick={onLogout}
+                aria-label="Log Out"
+              >
+                <LogOut className="w-5 h-5" />
                 Log Out
               </Button>
             </div>

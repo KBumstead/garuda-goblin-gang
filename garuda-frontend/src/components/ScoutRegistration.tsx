@@ -61,10 +61,7 @@ export function ScoutRegistration({ onRegister, onNavigateToLogin }: ScoutRegist
         <CardHeader className="text-center pb-2">
           {/* Logo */}
           <div className="flex items-center justify-center space-x-3 mb-6">
-            <div className="w-10 h-10 bg-[#f46036] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">B</span>
-            </div>
-            <span className="text-[#1b1b1e] font-bold text-2xl">BasketIndo</span>
+            <span className="text-[#1b1b1e] font-bold text-2xl">PickUp</span>
           </div>
           
           {/* Header */}
