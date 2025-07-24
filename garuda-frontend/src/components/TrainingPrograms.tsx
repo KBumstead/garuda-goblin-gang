@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { MapPin, Calendar, Users, DollarSign } from 'lucide-react';
+import { MapPin, Calendar, Users, DollarSign, PlusCircle } from 'lucide-react';
 
 const mockPrograms = [
   {
@@ -94,12 +94,27 @@ const getLevelColor = (level: string) => {
   }
 };
 
-export function TrainingPrograms() {
+interface TrainingProgramsProps {
+  userRole?: 'user' | 'scout' | 'trainer';
+}
+
+export function TrainingPrograms({ userRole }: TrainingProgramsProps) {
+  const handleAddProgram = () => {
+    alert('Add Training Program (modal coming soon!)');
+  };
   return (
     <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-[#fbfffe]">Available Training Programs</h1>
-        <p className="text-[#6d676e]">{mockPrograms.length} programs available</p>
+        <h1 className="text-3xl font-bold text-[#fbfffe]">Training Programs</h1>
+        {userRole === 'trainer' && (
+          <Button
+            className="flex items-center gap-2 bg-[#f46036] text-white font-bold px-4 py-2 rounded-lg shadow hover:bg-[#d94e1f] focus:bg-[#d94e1f] focus:outline-none focus:ring-2 focus:ring-[#f46036]/50 transition"
+            onClick={handleAddProgram}
+          >
+            <PlusCircle className="w-5 h-5" />
+            Add Training Program
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

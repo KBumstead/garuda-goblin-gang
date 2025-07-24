@@ -52,14 +52,20 @@ const mockPlayer = {
 
 interface PlayerProfileProps {
   onBack: () => void;
+  player?: any;
+  userRole?: 'user' | 'scout' | 'trainer';
 }
 
-export function PlayerProfile({ onBack }: PlayerProfileProps) {
+export function PlayerProfile({ onBack, player, userRole }: PlayerProfileProps) {
   const [scoutNotes, setScoutNotes] = useState("");
-  const [playerRank, setPlayerRank] = useState([75]);
+  // Use a 1-5 star rating system
+  const [playerRating, setPlayerRating] = useState([player?.rating || 3]);
+
+  // Use the passed player or fallback to mockPlayer
+  const p = player || mockPlayer;
 
   const handleSubmitReview = () => {
-    console.log("Review submitted:", { scoutNotes, playerRank: playerRank[0] });
+    console.log("Review submitted:", { scoutNotes, playerRank: playerRating[0] });
     // Handle review submission
   };
 
@@ -83,31 +89,31 @@ export function PlayerProfile({ onBack }: PlayerProfileProps) {
           <Card className="bg-[#fbfffe] border-[#6d676e]/20">
             <CardHeader className="text-center">
               <Avatar className="w-32 h-32 mx-auto">
-                <AvatarImage src={mockPlayer.avatar} alt={mockPlayer.name} />
-                <AvatarFallback className="text-2xl">AR</AvatarFallback>
+                <AvatarImage src={p.avatar} alt={p.name} />
+                <AvatarFallback className="text-2xl">{p.name?.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
               </Avatar>
-              <CardTitle className="text-2xl text-[#1b1b1e]">{mockPlayer.name}</CardTitle>
-              <p className="text-[#6d676e]">{mockPlayer.school}</p>
+              <CardTitle className="text-2xl text-[#1b1b1e]">{p.name}</CardTitle>
+              <p className="text-[#6d676e]">{p.school}</p>
               <Badge className="mx-auto bg-[#f46036]/10 text-[#f46036]">
-                {mockPlayer.position}
+                {p.position}
               </Badge>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <p className="text-2xl font-bold text-[#1b1b1e]">{mockPlayer.height}</p>
+                  <p className="text-2xl font-bold text-[#1b1b1e]">{p.height}</p>
                   <p className="text-sm text-[#6d676e]">Height</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-[#1b1b1e]">{mockPlayer.weight}</p>
+                  <p className="text-2xl font-bold text-[#1b1b1e]">{p.weight}</p>
                   <p className="text-sm text-[#6d676e]">Weight</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-[#1b1b1e]">{mockPlayer.age}</p>
+                  <p className="text-2xl font-bold text-[#1b1b1e]">{p.age}</p>
                   <p className="text-sm text-[#6d676e]">Age</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-[#1b1b1e]">{mockPlayer.stats.ppg}</p>
+                  <p className="text-2xl font-bold text-[#1b1b1e]">{p.stats?.ppg}</p>
                   <p className="text-sm text-[#6d676e]">PPG</p>
                 </div>
               </div>
@@ -117,23 +123,23 @@ export function PlayerProfile({ onBack }: PlayerProfileProps) {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-[#6d676e]">APG:</span>
-                    <span className="font-medium text-[#1b1b1e]">{mockPlayer.stats.apg}</span>
+                    <span className="font-medium text-[#1b1b1e]">{p.stats?.apg}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[#6d676e]">RPG:</span>
-                    <span className="font-medium text-[#1b1b1e]">{mockPlayer.stats.rpg}</span>
+                    <span className="font-medium text-[#1b1b1e]">{p.stats?.rpg}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[#6d676e]">FG%:</span>
-                    <span className="font-medium text-[#1b1b1e]">{mockPlayer.stats.fg}</span>
+                    <span className="font-medium text-[#1b1b1e]">{p.stats?.fg}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[#6d676e]">3PT%:</span>
-                    <span className="font-medium text-[#1b1b1e]">{mockPlayer.stats.threept}</span>
+                    <span className="font-medium text-[#1b1b1e]">{p.stats?.threept}</span>
                   </div>
                   <div className="flex justify-between col-span-2">
                     <span className="text-[#6d676e]">FT%:</span>
-                    <span className="font-medium text-[#1b1b1e]">{mockPlayer.stats.ft}</span>
+                    <span className="font-medium text-[#1b1b1e]">{p.stats?.ft}</span>
                   </div>
                 </div>
               </div>
@@ -158,50 +164,53 @@ export function PlayerProfile({ onBack }: PlayerProfileProps) {
                 <div>
                   <h3 className="text-lg font-semibold text-[#1b1b1e] mb-3">Scout Notes & Comments</h3>
                   <Textarea
-                    placeholder="Add your scouting notes and observations about this player..."
+                    placeholder={userRole === 'user' ? 'Viewing scout notes and observations...' : 'Add your scouting notes and observations about this player...'}
                     value={scoutNotes}
-                    onChange={(e) => setScoutNotes(e.target.value)}
+                    onChange={userRole === 'user' ? undefined : (e) => setScoutNotes(e.target.value)}
                     className="min-h-32 bg-white border-[#6d676e]/30 focus:border-[#f46036]"
+                    readOnly={userRole === 'user'}
                   />
                 </div>
                 
                 <div>
-                  <h3 className="text-lg font-semibold text-[#1b1b1e] mb-3">Player Ranking</h3>
+                  <h3 className="text-lg font-semibold text-[#1b1b1e] mb-3">Player Rating</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-[#6d676e]">Assign Rank (1-100)</span>
-                      <div className="flex items-center space-x-2">
-                        <Star className="w-5 h-5 text-[#f46036]" />
-                        <span className="text-xl font-bold text-[#1b1b1e]">{playerRank[0]}</span>
+                      <span className="text-[#6d676e]">{userRole === 'user' ? 'Assigned Rating' : 'Assign Rating (1-5 Stars)'}</span>
+                      <div className="flex items-center space-x-1">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            disabled={userRole === 'user'}
+                            onClick={userRole === 'user' ? undefined : () => setPlayerRating([i + 1])}
+                            style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: userRole === 'user' ? 'default' : 'pointer' }}
+                          >
+                            <Star className={`w-5 h-5 ${i < playerRating[0] ? 'text-[#f46036]' : 'text-[#e0e0e0]'}`} fill={i < playerRating[0] ? '#f46036' : 'none'} />
+                          </button>
+                        ))}
                       </div>
                     </div>
-                    <Slider
-                      value={playerRank}
-                      onValueChange={setPlayerRank}
-                      max={100}
-                      min={1}
-                      step={1}
-                      className="w-full"
-                    />
                     <div className="flex justify-between text-sm text-[#6d676e]">
                       <span>Needs Development</span>
                       <span>Elite Talent</span>
                     </div>
                   </div>
                 </div>
-                
-                <Button 
-                  onClick={handleSubmitReview}
-                  className="w-full bg-[#f46036] hover:bg-[#f46036]/90 text-white font-medium"
-                >
-                  Submit Review
-                </Button>
+                {userRole !== 'user' && (
+                  <Button 
+                    onClick={handleSubmitReview}
+                    className="w-full bg-[#f46036] hover:bg-[#f46036]/90 text-white font-medium"
+                  >
+                    Submit Review
+                  </Button>
+                )}
               </TabsContent>
               
               <TabsContent value="history" className="p-6">
                 <h3 className="text-lg font-semibold text-[#1b1b1e] mb-4">Recent Matches</h3>
                 <div className="space-y-4">
-                  {mockPlayer.matchHistory.map((match) => (
+                  {(p.matchHistory || []).map((match: any) => (
                     <div key={match.id} className="border border-[#6d676e]/20 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
