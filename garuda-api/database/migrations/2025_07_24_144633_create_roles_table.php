@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->id('role_id');
-            $table->enum('role_name', ['user', 'player', 'media', 'trainer', 'admin'])->unique();
+            $table->enum('role_name', ['user', 'scout', 'trainer', 'admin'])->unique();
         });
     }
 

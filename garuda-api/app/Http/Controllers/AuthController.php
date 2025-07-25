@@ -25,12 +25,21 @@ class AuthController extends Controller
             'full_name' => $request->full_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'user_type' => $roles[0], // Store the first role as primary for compatibility
         ]);
         // Assign all selected roles
         $roleIds = \App\Models\Role::whereIn('role_name', $roles)->pluck('role_id');
         $user->roles()->attach($roleIds);
-        return response()->json(['message' => 'Registration successful', 'user_type' => $user->user_type, 'roles' => $roles], 201);
+        // Create associated rows if needed
+        if (in_array('trainer', $roles)) {
+            \App\Models\Trainer::create(['user_id' => $user->user_id]);
+        }
+        if (in_array('scout', $roles)) {
+            \App\Models\Player::create(['user_id' => $user->user_id]);
+        }
+        // Return user fields and roles as a flat object
+        $userArray = $user->toArray();
+        $userArray['roles'] = $user->roles()->pluck('role_name');
+        return response()->json($userArray, 201);
     }
 
     // POST /login
@@ -45,10 +54,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
         $token = $user->createToken('api')->plainTextToken;
+        $userArray = $user->toArray();
+        $userArray['roles'] = $user->roles()->pluck('role_name');
         return response()->json([
             'token' => $token,
-            'user' => $user,
-            'user_type' => $user->user_type,
+            'user' => $userArray,
         ]);
     }
 

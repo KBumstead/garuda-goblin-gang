@@ -11,7 +11,7 @@ export async function fetchCsrfCookie() {
 
 function buildHeaders(base: Record<string, string>): Record<string, string> {
   const xsrfToken = getCookie('XSRF-TOKEN');
-  const headers = { ...base, 'Accept': 'application/json' }; // <-- Always add Accept
+  const headers: Record<string, string> = { ...base, 'Accept': 'application/json' };
   if (xsrfToken) {
     headers['X-XSRF-TOKEN'] = xsrfToken;
   }
@@ -77,6 +77,22 @@ export async function updateProfile(profile: any) {
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || "Failed to update profile");
+  }
+  return response.json();
+}
+
+export async function switchUserRole(newRole: 'user' | 'scout' | 'trainer') {
+  const token = localStorage.getItem("token");
+  const headers = buildHeaders({ "Content-Type": "application/json", "Authorization": `Bearer ${token}` });
+  const response = await fetch(`${API_URL}/profile`, {
+    method: "PATCH",
+    headers,
+    credentials: 'include',
+    body: JSON.stringify({ user_type: newRole }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to switch user role");
   }
   return response.json();
 } 
