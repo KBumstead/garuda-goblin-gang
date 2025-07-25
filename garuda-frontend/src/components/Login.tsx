@@ -4,6 +4,8 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Eye, EyeOff } from "lucide-react";
+import { login } from "../services/apiClient";
+import { SignUp } from "./SignUp";
 
 interface LoginProps {
   onLogin: (email: string, password: string) => void;
@@ -20,20 +22,32 @@ export function Login({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  // Add error state
+  const [error, setError] = useState<string | null>(null);
+  const [showSignUp, setShowSignUp] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (email && password) {
       setIsLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        onLogin(email, password);
+      try {
+        const data = await login(email, password);
+        localStorage.setItem("token", data.token);
+        onLogin(email, password); // Optionally pass user data
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
         setIsLoading(false);
-      }, 1000);
+      }
     }
   };
 
   const isFormValid = email.trim() && password.trim();
+
+  if (showSignUp) {
+    return <SignUp onNavigateToLogin={() => setShowSignUp(false)} />;
+  }
 
   return (
     <div className="min-h-screen bg-[#1b1b1e] flex items-center justify-center p-4">
@@ -48,6 +62,10 @@ export function Login({
         </CardHeader>
 
         <CardContent>
+          {/* Error Message */}
+          {error && (
+            <div className="text-red-500 text-center mb-2">{error}</div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div className="space-y-2">
@@ -120,7 +138,7 @@ export function Login({
                 Don't have an account?{" "}
                 <button
                   type="button"
-                  onClick={onNavigateToSignUp}
+                  onClick={() => setShowSignUp(true)}
                   className="text-[#f46036] hover:text-[#f46036]/80 font-medium transition-colors"
                 >
                   Sign Up
