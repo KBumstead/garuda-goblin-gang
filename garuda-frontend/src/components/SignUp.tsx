@@ -17,6 +17,15 @@ export function SignUp({ onNavigateToLogin }: SignUpProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [roles, setRoles] = useState<string[]>(['user']);
+
+  const handleRoleChange = (role: string) => {
+    setRoles((prev) =>
+      prev.includes(role)
+        ? prev.filter((r) => r !== role)
+        : [...prev, role]
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,9 +39,13 @@ export function SignUp({ onNavigateToLogin }: SignUpProps) {
       setError("Passwords do not match.");
       return;
     }
+    if (roles.length === 0) {
+      setError("Please select at least one role.");
+      return;
+    }
     setIsLoading(true);
     try {
-      await register(fullName, email, password, passwordConfirmation);
+      await register(fullName, email, password, passwordConfirmation, roles);
       setSuccess(true);
     } catch (err: any) {
       setError(err.message);
@@ -101,6 +114,41 @@ export function SignUp({ onNavigateToLogin }: SignUpProps) {
                 className="bg-white border-[#6d676e]/30 focus:border-[#f46036] focus:ring-[#f46036] text-[#1b1b1e]"
                 required
               />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[#1b1b1e] font-medium">Register as</Label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-1">
+                  <input
+                    type="checkbox"
+                    name="userType"
+                    value="user"
+                    checked={roles.includes('user')}
+                    onChange={() => handleRoleChange('user')}
+                  />
+                  User
+                </label>
+                <label className="flex items-center gap-1">
+                  <input
+                    type="checkbox"
+                    name="userType"
+                    value="scout"
+                    checked={roles.includes('scout')}
+                    onChange={() => handleRoleChange('scout')}
+                  />
+                  Scout
+                </label>
+                <label className="flex items-center gap-1">
+                  <input
+                    type="checkbox"
+                    name="userType"
+                    value="trainer"
+                    checked={roles.includes('trainer')}
+                    onChange={() => handleRoleChange('trainer')}
+                  />
+                  Trainer
+                </label>
+              </div>
             </div>
             <Button
               type="submit"

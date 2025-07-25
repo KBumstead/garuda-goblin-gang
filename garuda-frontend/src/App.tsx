@@ -45,18 +45,19 @@ export default function App() {
     localStorage.setItem('userRole', userRole);
   }, [isAuthenticated, userRole]);
 
-  const handleLogin = (email: string, password: string) => {
+  const handleLogin = (email: string, password: string, userType: string) => {
     setIsAuthenticated(true);
-    let role: "user" | "scout" | "trainer" = "user";
-    if (email.includes("scout") || email.includes("media")) {
-      role = "scout";
-    } else if (email.includes("trainer") || email.includes("coach")) {
-      role = "trainer";
-    }
-    setUserRole(role);
+    setUserRole(userType as "user" | "scout" | "trainer");
     localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('userRole', role);
-    navigate("/");
+    localStorage.setItem('userRole', userType);
+    // Redirect based on userType
+    if (userType === 'scout') {
+      navigate('/player-database');
+    } else if (userType === 'trainer') {
+      navigate('/training-programs');
+    } else {
+      navigate('/');
+    }
   };
 
   const handleScoutRegistration = (formData: any) => {

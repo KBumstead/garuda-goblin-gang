@@ -8,7 +8,7 @@ import { login } from "../services/apiClient";
 import { SignUp } from "./SignUp";
 
 interface LoginProps {
-  onLogin: (email: string, password: string) => void;
+  onLogin: (email: string, password: string, userType: string) => void;
   onNavigateToSignUp: () => void;
   onForgotPassword: () => void;
 }
@@ -34,7 +34,8 @@ export function Login({
       try {
         const data = await login(email, password);
         localStorage.setItem("token", data.token);
-        onLogin(email, password); // Optionally pass user data
+        localStorage.setItem("userRole", data.user_type || "user");
+        onLogin(email, password, data.user_type || "user");
       } catch (err: any) {
         setError(err.message);
       } finally {

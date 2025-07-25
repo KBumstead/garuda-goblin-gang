@@ -17,18 +17,20 @@ class AuthController extends Controller
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
+            'roles' => 'required|array|min:1',
+            'roles.*' => 'in:user,scout,trainer',
         ]);
+        $roles = $request->roles;
         $user = User::create([
             'full_name' => $request->full_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'user_type' => $roles[0], // Store the first role as primary for compatibility
         ]);
-        // Optionally assign default role
-        $role = Role::where('role_name', 'user')->first();
-        if ($role) {
-            $user->roles()->attach($role->role_id);
-        }
-        return response()->json(['message' => 'Registration successful'], 201);
+        // Assign all selected roles
+        $roleIds = \App\Models\Role::whereIn('role_name', $roles)->pluck('role_id');
+        $user->roles()->attach($roleIds);
+        return response()->json(['message' => 'Registration successful', 'user_type' => $user->user_type, 'roles' => $roles], 201);
     }
 
     // POST /login
@@ -46,6 +48,7 @@ class AuthController extends Controller
         return response()->json([
             'token' => $token,
             'user' => $user,
+            'user_type' => $user->user_type,
         ]);
     }
 
@@ -73,11 +76,13 @@ class AuthController extends Controller
         }
         $request->validate([
             'full_name' => 'sometimes|required|string|max:255',
+            'bio' => 'nullable|string',
+            'age' => 'nullable|integer',
+            'gender' => 'nullable|string|max:20',
+            'height' => 'nullable|numeric',
             'password' => 'sometimes|required|string|min:6|confirmed',
         ]);
-        if ($request->has('full_name')) {
-            $target->full_name = $request->full_name;
-        }
+        $target->fill($request->only(['full_name', 'bio', 'age', 'gender', 'height']));
         if ($request->has('password')) {
             $target->password = Hash::make($request->password);
         }
