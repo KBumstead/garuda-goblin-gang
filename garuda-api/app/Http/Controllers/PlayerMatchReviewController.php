@@ -79,8 +79,8 @@ class PlayerMatchReviewController extends Controller
 
     protected function authorizeMediaOrAdmin($user)
     {
-        if (!$user || (!$user->roles()->where('role_name', 'media')->exists() && !$this->isAdmin($user))) {
-            abort(403, 'Media or admin only.');
+        if (!$user || (!$user->roles()->where('role_name', 'scout')->exists() && !$this->isAdmin($user))) {
+            abort(403, 'Scout or admin only.');
         }
     }
 

@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile', [AuthController::class, 'updateProfile']);
 });
 
+Route::get('/players', [PlayerController::class, 'index']);
 Route::get('/players/{id}', [PlayerController::class, 'show']);
 Route::get('/players/{id}/reviews', [PlayerController::class, 'reviews']);
 Route::get('/players/ranking', [PlayerController::class, 'ranking']);

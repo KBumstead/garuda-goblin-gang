@@ -12,12 +12,17 @@ class PlayerMatchStatsController extends Controller
     public function show(Request $request)
     {
         $request->validate([
-            'match_id' => 'required|exists:matches,match_id',
-            'player_id' => 'required|exists:players,player_id',
+            'match_id' => 'sometimes|exists:matches,match_id',
+            'player_id' => 'sometimes|exists:players,player_id',
         ]);
-        $stats = PlayerMatchStats::where('match_id', $request->match_id)
-            ->where('player_id', $request->player_id)
-            ->firstOrFail();
+        $query = PlayerMatchStats::query();
+        if ($request->has('match_id')) {
+            $query->where('match_id', $request->match_id);
+        }
+        if ($request->has('player_id')) {
+            $query->where('player_id', $request->player_id);
+        }
+        $stats = $query->get();
         return response()->json($stats);
     }
 

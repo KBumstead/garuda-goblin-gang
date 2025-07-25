@@ -59,5 +59,25 @@ class PlayerSeeder extends Seeder
                 ]);
             }
         }
+        $school = School::first();
+        $clubs = Club::all();
+        if ($school && $clubs->count() > 0) {
+            foreach (User::all() as $user) {
+                // Avoid duplicate players for users who already have a player
+                if (Player::where('user_id', $user->user_id)->exists())
+                    continue;
+                $club = $clubs->random();
+                $player = Player::create([
+                    'user_id' => $user->user_id,
+                    'school_id' => $school->school_id,
+                    'height_cm' => rand(160, 200),
+                    'weight_kg' => rand(55, 100),
+                    'position' => 'Guard',
+                    'date_of_birth' => now()->subYears(rand(15, 20))->toDateString(),
+                    'overall_ranking' => rand(1, 10),
+                ]);
+                $player->clubs()->attach($club->club_id, ['join_date' => now()->subYears(1)->toDateString()]);
+            }
+        }
     }
-} 
+}

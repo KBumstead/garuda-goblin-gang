@@ -17,69 +17,72 @@ class MatchSeeder extends Seeder
     public function run(): void
     {
         $tournament = Tournament::first();
-        $club1 = Club::where('name', 'Garuda FC')->first();
-        $club2 = Club::where('name', 'Goblin United')->first();
-        $school1 = School::where('name', 'SMA Negeri 1 Jakarta')->first();
-        $school2 = School::where('name', 'SMA Negeri 2 Bandung')->first();
-        if ($tournament && $club1 && $club2 && $school1 && $school2) {
-            $match = MatchModel::create([
-                'tournament_id' => $tournament->tournament_id,
-                'home_club_id' => $club1->club_id,
-                'away_club_id' => $club2->club_id,
-                'home_school_id' => $school1->school_id,
-                'away_school_id' => $school2->school_id,
-                'match_datetime' => '2024-08-02 15:00:00',
-                'venue' => 'Stadion Utama',
-                'home_team_score' => 80,
-                'away_team_score' => 75,
-            ]);
-            $player1 = Player::whereHas('user', function($q) { $q->where('email', 'player@example.com'); })->first();
-            $player2 = Player::whereHas('user', function($q) { $q->where('email', 'player.trainer@example.com'); })->first();
-            $reviewer = User::where('email', 'viewer@example.com')->first();
-            if ($player1 && $match) {
-                PlayerMatchStats::create([
-                    'player_id' => $player1->player_id,
-                    'match_id' => $match->match_id,
-                    'minutes_played' => 30,
-                    'points' => 20,
-                    'assists' => 5,
-                    'rebounds' => 7,
-                    'steals' => 2,
-                    'blocks' => 1,
-                    'field_goals_made' => 8,
-                    'field_goals_attempted' => 15,
-                ]);
-                if ($reviewer) {
-                    PlayerMatchReview::create([
-                        'user_id' => $reviewer->user_id,
-                        'player_id' => $player1->player_id,
-                        'match_id' => $match->match_id,
-                        'comment' => 'Permainan sangat bagus!'
-                    ]);
+        $clubs = Club::all();
+        $schools = School::all();
+        $players = Player::all();
+        $matches = [];
+        echo 'Schools count: ' . $schools->count() . PHP_EOL;
+        echo 'Clubs count: ' . $clubs->count() . PHP_EOL;
+        echo 'Players count: ' . $players->count() . PHP_EOL;
+        if ($schools->count() < 2) {
+            echo 'Not enough schools to seed matches. Skipping match seeding.' . PHP_EOL;
+            return;
+        }
+        if ($clubs->count() < 2) {
+            echo 'Not enough clubs to seed matches. Skipping match seeding.' . PHP_EOL;
+            return;
+        }
+        if ($players->count() < 1) {
+            echo 'No players found to seed player match stats. Skipping player stats.' . PHP_EOL;
+            return;
+        }
+        if ($tournament && $clubs->count() >= 2) {
+            $venues = ['Stadion Utama', 'Arena Bandung', 'Surabaya Hall', 'Medan Arena', 'Yogyakarta Dome'];
+            $date = now()->addDays(1);
+            $venueIdx = 0;
+            $matches = [];
+
+            // Iterate through clubs two at a time
+            for ($i = 0; $i < min($clubs->count(), 8); $i += 2) {
+                if (!isset($clubs[$i + 1])) {
+                    break; // make sure there is a pair
                 }
+
+                $homeClub = $clubs[$i];
+                $awayClub = $clubs[$i + 1];
+
+                $match = MatchModel::create([
+                    'tournament_id' => $tournament->tournament_id,
+                    'home_club_id' => $homeClub->club_id,
+                    'away_club_id' => $awayClub->club_id,
+                    'home_school_id' => null,
+                    'away_school_id' => null,
+                    'match_datetime' => $date->addDays(1),
+                    'venue' => $venues[$venueIdx % count($venues)],
+                    'home_team_score' => rand(60, 100),
+                    'away_team_score' => rand(60, 100),
+                ]);
+
+                $matches[] = $match;
+                $venueIdx++;
             }
-            if ($player2 && $match) {
+        }
+        // Add player stats for each match
+        foreach ($matches as $match) {
+            foreach ($players as $player) {
                 PlayerMatchStats::create([
-                    'player_id' => $player2->player_id,
+                    'player_id' => $player->player_id,
                     'match_id' => $match->match_id,
-                    'minutes_played' => 28,
-                    'points' => 15,
-                    'assists' => 7,
-                    'rebounds' => 5,
-                    'steals' => 1,
-                    'blocks' => 0,
-                    'field_goals_made' => 6,
-                    'field_goals_attempted' => 12,
+                    'minutes_played' => rand(20, 40),
+                    'points' => rand(5, 30),
+                    'assists' => rand(0, 10),
+                    'rebounds' => rand(0, 12),
+                    'steals' => rand(0, 5),
+                    'blocks' => rand(0, 3),
+                    'field_goals_made' => rand(2, 12),
+                    'field_goals_attempted' => rand(5, 20),
                 ]);
-                if ($reviewer) {
-                    PlayerMatchReview::create([
-                        'user_id' => $reviewer->user_id,
-                        'player_id' => $player2->player_id,
-                        'match_id' => $match->match_id,
-                        'comment' => 'Perlu meningkatkan defense.'
-                    ]);
-                }
             }
         }
     }
-} 
+}

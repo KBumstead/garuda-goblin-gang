@@ -74,7 +74,14 @@ class PlayerController extends Controller
                 'match_id' => $request->match_id,
             ],
             $request->only([
-                'minutes_played', 'points', 'assists', 'rebounds', 'steals', 'blocks', 'field_goals_made', 'field_goals_attempted'
+                'minutes_played',
+                'points',
+                'assists',
+                'rebounds',
+                'steals',
+                'blocks',
+                'field_goals_made',
+                'field_goals_attempted'
             ])
         );
         return response()->json($stats);
@@ -116,6 +123,55 @@ class PlayerController extends Controller
         $players = $query->orderByDesc('overall_ranking')->paginate($perPage);
         // Hide relations
         $players->getCollection()->makeHidden(['user', 'school', 'clubs', 'generalReviews', 'matchReviews', 'matchStats', 'programApplications']);
+        return response()->json($players);
+    }
+
+    // GET /players?match_id=...&club_id=...&age_min=...&age_max=...&gender=...&name=...
+    public function index(Request $request)
+    {
+        $query = Player::query();
+
+        // Filter by match_id (players who have stats for this match)
+        if ($request->filled('match_id')) {
+            $query->whereHas('matchStats', function ($q) use ($request) {
+                $q->where('match_id', $request->input('match_id'));
+            });
+        }
+
+        // Filter by club_id (players who belong to this club)
+        if ($request->filled('club_id')) {
+            $query->whereHas('clubs', function ($q) use ($request) {
+                $q->where('clubs.club_id', $request->input('club_id'));
+            });
+        }
+
+        // Filter by age range
+        $today = now();
+        if ($request->filled('age_min')) {
+            $maxBirth = $today->copy()->subYears($request->input('age_min'));
+            $query->where('date_of_birth', '<=', $maxBirth->toDateString());
+        }
+        if ($request->filled('age_max')) {
+            $minBirth = $today->copy()->subYears($request->input('age_max') + 1)->addDay();
+            $query->where('date_of_birth', '>=', $minBirth->toDateString());
+        }
+
+        // Filter by gender (via user relation, assuming gender is on users table)
+        if ($request->filled('gender')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('gender', $request->input('gender'));
+            });
+        }
+
+        // Filter by name (partial match, via user relation)
+        if ($request->filled('name')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('full_name', 'like', '%' . $request->input('name') . '%');
+            });
+        }
+
+        $perPage = $request->input('per_page', 10);
+        $players = $query->with(['clubs', 'school', 'user'])->paginate($perPage);
         return response()->json($players);
     }
 
