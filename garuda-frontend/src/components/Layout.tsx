@@ -1,46 +1,72 @@
-import React, { useState } from 'react';
-import { Home, Users, TrendingUp, MapPin, UserPlus, Database, FileText, ClipboardList, User, LogOut, UserCircle, Menu } from 'lucide-react';
-import { cn } from './ui/utils';
-import { useIsMobile } from './ui/use-mobile';
+import React, { useState } from "react";
+import {
+  Home,
+  Users,
+  TrendingUp,
+  MapPin,
+  UserPlus,
+  Database,
+  FileText,
+  ClipboardList,
+  User,
+  LogOut,
+  UserCircle,
+  Menu,
+} from "lucide-react";
+import { cn } from "./ui/utils";
+import { useIsMobile } from "./ui/use-mobile";
 
 interface LayoutProps {
   children: React.ReactNode;
   activeScreen: string;
   onScreenChange: (screen: string) => void;
-  userRole: 'user' | 'scout' | 'trainer';
-  onRoleChange: (role: 'user' | 'scout' | 'trainer') => void;
+  userRole: "user" | "scout" | "trainer";
+  onRoleChange: (role: "user" | "scout" | "trainer") => void;
 }
 
-export function Layout({ children, activeScreen, onScreenChange, userRole, onRoleChange }: LayoutProps) {
+export function Layout({
+  children,
+  activeScreen,
+  onScreenChange,
+  userRole,
+  onRoleChange,
+}: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
 
   // Remove 'Profile' from menu items
-  const filterProfile = (items: any[]) => items.filter(item => item.label !== 'Profile');
+  const filterProfile = (items: any[]) =>
+    items.filter((item) => item.label !== "Profile");
 
   const userMenuItems = filterProfile([
-    { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'player-rankings', label: 'Player Rankings', icon: TrendingUp },
-    { id: 'school-rankings', label: 'School Rankings', icon: Users },
-    { id: 'training-programs', label: 'Training Programs', icon: FileText },
-    { id: 'clubs', label: 'Clubs', icon: MapPin },
+    { id: "dashboard", label: "Dashboard", icon: Home },
+    { id: "player-rankings", label: "Player Rankings", icon: TrendingUp },
+    // { id: "school-rankings", label: "School Rankings", icon: Users },
+    { id: "training-programs", label: "Training Programs", icon: FileText },
+    { id: "clubs", label: "Clubs", icon: MapPin },
+    { id: "matches", label: "Matches", icon: ClipboardList },
     // { id: 'profile', label: 'Profile', icon: User },
   ]);
   const scoutMenuItems = filterProfile([
-    { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'player-database', label: 'Player Database', icon: Database },
-    { id: 'add-match-review', label: 'Add Match Review', icon: ClipboardList },
-    { id: 'my-reports', label: 'My Reports', icon: FileText },
+    { id: "dashboard", label: "Dashboard", icon: Home },
+    { id: "player-database", label: "Player Database", icon: Database },
+    { id: "add-match-review", label: "Add Match Review", icon: ClipboardList },
+    { id: "my-reports", label: "My Reports", icon: FileText },
     // { id: 'profile', label: 'Profile', icon: User },
   ]);
   const trainerMenuItems = filterProfile([
-    { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'training-programs', label: 'Training Programs', icon: FileText },
-    { id: 'clubs', label: 'Clubs', icon: MapPin },
+    { id: "dashboard", label: "Dashboard", icon: Home },
+    { id: "training-programs", label: "Training Programs", icon: FileText },
+    { id: "clubs", label: "Clubs", icon: MapPin },
     // { id: 'profile', label: 'Profile', icon: User },
   ]);
 
-  const menuItems = userRole === 'user' ? userMenuItems : userRole === 'trainer' ? trainerMenuItems : scoutMenuItems;
+  const menuItems =
+    userRole === "user"
+      ? userMenuItems
+      : userRole === "trainer"
+      ? trainerMenuItems
+      : scoutMenuItems;
 
   // TopBar component
   const TopBar = () => (
@@ -53,18 +79,20 @@ export function Layout({ children, activeScreen, onScreenChange, userRole, onRol
         >
           <Menu className="w-6 h-6 text-[#f46036]" />
         </button>
-        <span className="text-[#f46036] font-extrabold text-2xl tracking-wide">PICKUPs</span>
+        <span className="text-[#f46036] font-extrabold text-2xl tracking-wide">
+          PICKUPs
+        </span>
       </div>
       <div className="flex items-center gap-4">
         <button
-          onClick={() => onScreenChange('profile')}
+          onClick={() => onScreenChange("profile")}
           className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#23232b] text-white hover:bg-[#f46036] hover:text-white transition-all"
         >
           <UserCircle className="w-6 h-6" />
           <span className="hidden sm:inline font-medium">Profile</span>
         </button>
         <button
-          onClick={() => onScreenChange('logout')}
+          onClick={() => onScreenChange("logout")}
           className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#f46036] text-white font-bold border-2 border-[#f46036] shadow hover:bg-[#d94e1f] hover:scale-105 focus:bg-[#d94e1f] focus:scale-105 focus:outline-none focus:ring-2 focus:ring-[#f46036]/60 transition-all duration-150"
           aria-label="Log Out"
         >
@@ -80,15 +108,19 @@ export function Layout({ children, activeScreen, onScreenChange, userRole, onRol
       <TopBar />
       <div className="flex">
         {/* Sidebar */}
-        <div className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-[#1b1b1e] border-r border-[#6d676e]/20 z-20 transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
+        <div
+          className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-[#1b1b1e] border-r border-[#6d676e]/20 z-20 transition-transform duration-200 ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0`}
+        >
           {/* Role Switcher */}
           <div className="p-4 border-b border-[#6d676e]/20">
             <div className="flex bg-[#6d676e]/20 rounded-lg p-1">
               <button
-                onClick={() => onRoleChange('user')}
+                onClick={() => onRoleChange("user")}
                 className={cn(
                   "flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all",
-                  userRole === 'user'
+                  userRole === "user"
                     ? "bg-[#f46036] text-white"
                     : "text-[#6d676e] hover:text-[#fbfffe]"
                 )}
@@ -96,10 +128,10 @@ export function Layout({ children, activeScreen, onScreenChange, userRole, onRol
                 User
               </button>
               <button
-                onClick={() => onRoleChange('scout')}
+                onClick={() => onRoleChange("scout")}
                 className={cn(
                   "flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all",
-                  userRole === 'scout'
+                  userRole === "scout"
                     ? "bg-[#f46036] text-white"
                     : "text-[#6d676e] hover:text-[#fbfffe]"
                 )}
@@ -107,10 +139,10 @@ export function Layout({ children, activeScreen, onScreenChange, userRole, onRol
                 Scout
               </button>
               <button
-                onClick={() => onRoleChange('trainer')}
+                onClick={() => onRoleChange("trainer")}
                 className={cn(
                   "flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all",
-                  userRole === 'trainer'
+                  userRole === "trainer"
                     ? "bg-[#f46036] text-white"
                     : "text-[#6d676e] hover:text-[#fbfffe]"
                 )}

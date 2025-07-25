@@ -10,7 +10,11 @@ import { PlayerProfile } from "./components/PlayerProfile";
 import { AddMatchReview } from "./components/AddMatchReview";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { DashboardCarousel } from "./components/DashboardCarousel";
-import { Popover, PopoverContent, PopoverTrigger } from "./components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "./components/ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
 import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
@@ -23,40 +27,44 @@ const Unauthorized = () => (
   </div>
 );
 import { ProfileManagement } from "./components/ProfileManagement";
+import { MatchesList } from "./components/MatchesList";
 
 type AuthView = "login" | "scout-registration" | "forgot-password";
 
 export default function App() {
   // Restore auth state from localStorage
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
+    return localStorage.getItem("isAuthenticated") === "true";
   });
   const [authView, setAuthView] = useState<AuthView>("login");
   const [activeScreen, setActiveScreen] = useState("dashboard");
   const [userRole, setUserRole] = useState<"user" | "scout" | "trainer">(() => {
-    return (localStorage.getItem('userRole') as "user" | "scout" | "trainer") || "user";
+    return (
+      (localStorage.getItem("userRole") as "user" | "scout" | "trainer") ||
+      "user"
+    );
   });
   const [showPlayerProfile, setShowPlayerProfile] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.setItem('isAuthenticated', String(isAuthenticated));
-    localStorage.setItem('userRole', userRole);
+    localStorage.setItem("isAuthenticated", String(isAuthenticated));
+    localStorage.setItem("userRole", userRole);
   }, [isAuthenticated, userRole]);
 
   const handleLogin = (email: string, password: string, userType: string) => {
     setIsAuthenticated(true);
     setUserRole(userType as "user" | "scout" | "trainer");
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('userRole', userType);
+    localStorage.setItem("isAuthenticated", "true");
+    localStorage.setItem("userRole", userType);
     // Redirect based on userType
-    if (userType === 'scout') {
-      navigate('/player-database');
-    } else if (userType === 'trainer') {
-      navigate('/training-programs');
+    if (userType === "scout") {
+      navigate("/player-database");
+    } else if (userType === "trainer") {
+      navigate("/training-programs");
     } else {
-      navigate('/');
+      navigate("/");
     }
   };
 
@@ -73,8 +81,8 @@ export default function App() {
     setActiveScreen("dashboard");
     setShowPlayerProfile(false);
     setAuthView("login");
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userRole');
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("userRole");
     navigate("/login");
   };
 
@@ -92,7 +100,7 @@ export default function App() {
     setUserRole(role);
     setActiveScreen("dashboard");
     setShowPlayerProfile(false);
-    localStorage.setItem('userRole', role);
+    localStorage.setItem("userRole", role);
     navigate("/");
   };
 
@@ -106,25 +114,67 @@ export default function App() {
     alert("Forgot password functionality would be implemented here.");
   };
   const mockPlayers = [
-    { id: 1, name: 'Budi Santoso', avatar: 'https://placehold.co/40x40', rating: 95 },
-    { id: 2, name: 'Citra Dewi', avatar: 'https://placehold.co/40x40', rating: 92 },
-    { id: 3, name: 'Eka Sari', avatar: 'https://placehold.co/40x40', rating: 90 },
+    {
+      id: 1,
+      name: "Budi Santoso",
+      avatar: "https://placehold.co/40x40",
+      rating: 95,
+    },
+    {
+      id: 2,
+      name: "Citra Dewi",
+      avatar: "https://placehold.co/40x40",
+      rating: 92,
+    },
+    {
+      id: 3,
+      name: "Eka Sari",
+      avatar: "https://placehold.co/40x40",
+      rating: 90,
+    },
   ];
   // Add mock data for school rankings and tournaments
   const mockSchoolRankings = [
-    { id: 1, name: 'SMA Jakarta Utara', region: 'Jakarta', points: 98 },
-    { id: 2, name: 'SMA Bandung Raya', region: 'West Java', points: 92 },
-    { id: 3, name: 'SMA Surabaya', region: 'East Java', points: 89 },
+    { id: 1, name: "SMA Jakarta Utara", region: "Jakarta", points: 98 },
+    { id: 2, name: "SMA Bandung Raya", region: "West Java", points: 92 },
+    { id: 3, name: "SMA Surabaya", region: "East Java", points: 89 },
   ];
   const mockTournaments = [
-    { id: 1, name: 'National High School Cup', date: '2024-08-10', location: 'Jakarta' },
-    { id: 2, name: 'Java Regional Qualifier', date: '2024-08-24', location: 'Bandung' },
-    { id: 3, name: 'Sumatra Invitational', date: '2024-09-05', location: 'Medan' },
+    {
+      id: 1,
+      name: "National High School Cup",
+      date: "2024-08-10",
+      location: "Jakarta",
+    },
+    {
+      id: 2,
+      name: "Java Regional Qualifier",
+      date: "2024-08-24",
+      location: "Bandung",
+    },
+    {
+      id: 3,
+      name: "Sumatra Invitational",
+      date: "2024-09-05",
+      location: "Medan",
+    },
   ];
   // Add mockPrograms for training programs
   const mockPrograms = [
-    { id: 1, name: "Elite Basketball Camp", date: "2024-08-15", location: "Jakarta", description: "Intensive camp for high school players." },
-    { id: 2, name: "Youth Development Program", date: "2024-09-01", location: "Bandung", description: "Foundational training for ages 13-16." },
+    {
+      id: 1,
+      name: "Elite Basketball Camp",
+      date: "2024-08-15",
+      location: "Jakarta",
+      description: "Intensive camp for high school players.",
+    },
+    {
+      id: 2,
+      name: "Youth Development Program",
+      date: "2024-09-01",
+      location: "Bandung",
+      description: "Foundational training for ages 13-16.",
+    },
   ];
 
   // Auth routes
@@ -157,35 +207,35 @@ export default function App() {
 
   // Main app routes (protected)
   type CarouselItem = {
-    type: 'Tournament' | 'Training';
+    type: "Tournament" | "Training";
     title: string;
     organizer: string;
     image: string;
   };
   const carouselItems: CarouselItem[] = [
     {
-      type: 'Tournament',
-      title: 'Jakarta 3x3 Championship',
-      organizer: 'Perbasi DKI Jakarta',
-      image: 'https://placehold.co/600x400/f46036/fbfffe?text=Tournament',
+      type: "Tournament",
+      title: "Jakarta 3x3 Championship",
+      organizer: "Perbasi DKI Jakarta",
+      image: "https://placehold.co/600x400/f46036/fbfffe?text=Tournament",
     },
     {
-      type: 'Training',
-      title: 'Elite Guard Training Camp',
-      organizer: 'Coach Andi',
-      image: 'https://placehold.co/600x400/1b1b1e/fbfffe?text=Training',
+      type: "Training",
+      title: "Elite Guard Training Camp",
+      organizer: "Coach Andi",
+      image: "https://placehold.co/600x400/1b1b1e/fbfffe?text=Training",
     },
     {
-      type: 'Tournament',
-      title: 'Surabaya High School Cup',
-      organizer: 'DBL Indonesia',
-      image: 'https://placehold.co/600x400/f46036/fbfffe?text=Tournament',
+      type: "Tournament",
+      title: "Surabaya High School Cup",
+      organizer: "DBL Indonesia",
+      image: "https://placehold.co/600x400/f46036/fbfffe?text=Tournament",
     },
     {
-      type: 'Training',
-      title: 'Youth Development Program',
-      organizer: 'Jakarta Basketball Academy',
-      image: 'https://placehold.co/600x400/1b1b1e/fbfffe?text=Training',
+      type: "Training",
+      title: "Youth Development Program",
+      organizer: "Jakarta Basketball Academy",
+      image: "https://placehold.co/600x400/1b1b1e/fbfffe?text=Training",
     },
   ];
 
@@ -246,48 +296,103 @@ export default function App() {
                   {/* Player Rankings Preview */}
                   <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20 flex flex-col">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-semibold text-[#1b1b1e]">Player Rankings Preview</h3>
-                      <Button size="sm" className="bg-[#f46036] text-white px-3 py-1 rounded-md text-xs font-semibold hover:bg-[#d94e1f]" onClick={() => handleScreenChange('player-rankings')}>View All</Button>
+                      <h3 className="text-xl font-semibold text-[#1b1b1e]">
+                        Player Rankings Preview
+                      </h3>
+                      <Button
+                        size="sm"
+                        className="bg-[#f46036] text-white px-3 py-1 rounded-md text-xs font-semibold hover:bg-[#d94e1f]"
+                        onClick={() => handleScreenChange("player-rankings")}
+                      >
+                        View All
+                      </Button>
                     </div>
                     <ol className="space-y-3">
-                      {mockPlayers.slice(0, 3).map((player: typeof mockPlayers[0], idx: number) => (
-                        <li key={player.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#f46036]/10 transition">
-                          <span className="w-7 h-7 flex items-center justify-center bg-[#f46036] text-white rounded-full font-bold">{idx + 1}</span>
-                          <Avatar className="w-8 h-8">
-                            <AvatarImage src={player.avatar} alt={player.name} />
-                            <AvatarFallback>{player.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                          </Avatar>
-                          <span className="font-medium text-[#1b1b1e]">{player.name}</span>
-                          <span className="ml-auto text-[#f46036] font-bold">★ {player.rating}</span>
-                        </li>
-                      ))}
+                      {mockPlayers
+                        .slice(0, 3)
+                        .map((player: (typeof mockPlayers)[0], idx: number) => (
+                          <li
+                            key={player.id}
+                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#f46036]/10 transition"
+                          >
+                            <span className="w-7 h-7 flex items-center justify-center bg-[#f46036] text-white rounded-full font-bold">
+                              {idx + 1}
+                            </span>
+                            <Avatar className="w-8 h-8">
+                              <AvatarImage
+                                src={player.avatar}
+                                alt={player.name}
+                              />
+                              <AvatarFallback>
+                                {player.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-medium text-[#1b1b1e]">
+                              {player.name}
+                            </span>
+                            <span className="ml-auto text-[#f46036] font-bold">
+                              ★ {player.rating}
+                            </span>
+                          </li>
+                        ))}
                     </ol>
                   </div>
                   {/* School Rankings Preview */}
                   <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20 flex flex-col">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-semibold text-[#1b1b1e]">School Rankings Preview</h3>
-                      <Button size="sm" className="bg-[#f46036] text-white px-3 py-1 rounded-md text-xs font-semibold hover:bg-[#d94e1f]" onClick={() => handleScreenChange('school-rankings')}>View All</Button>
+                      <h3 className="text-xl font-semibold text-[#1b1b1e]">
+                        School Rankings Preview
+                      </h3>
+                      <Button
+                        size="sm"
+                        className="bg-[#f46036] text-white px-3 py-1 rounded-md text-xs font-semibold hover:bg-[#d94e1f]"
+                        onClick={() => handleScreenChange("school-rankings")}
+                      >
+                        View All
+                      </Button>
                     </div>
                     <ol className="space-y-3">
                       {mockSchoolRankings.slice(0, 3).map((school, idx) => (
-                        <li key={school.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#f46036]/10 transition">
-                          <span className="w-7 h-7 flex items-center justify-center bg-[#f46036] text-white rounded-full font-bold">{idx + 1}</span>
-                          <span className="font-medium text-[#1b1b1e]">{school.name}</span>
-                          <Badge className="ml-2 bg-[#f46036]/10 text-[#f46036] px-2 py-0.5 text-xs font-semibold">{school.region}</Badge>
-                          <span className="ml-auto text-[#f46036] font-bold">{school.points} pts</span>
+                        <li
+                          key={school.id}
+                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#f46036]/10 transition"
+                        >
+                          <span className="w-7 h-7 flex items-center justify-center bg-[#f46036] text-white rounded-full font-bold">
+                            {idx + 1}
+                          </span>
+                          <span className="font-medium text-[#1b1b1e]">
+                            {school.name}
+                          </span>
+                          <Badge className="ml-2 bg-[#f46036]/10 text-[#f46036] px-2 py-0.5 text-xs font-semibold">
+                            {school.region}
+                          </Badge>
+                          <span className="ml-auto text-[#f46036] font-bold">
+                            {school.points} pts
+                          </span>
                         </li>
                       ))}
                     </ol>
                   </div>
                   {/* Upcoming Tournaments (unchanged) */}
                   <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20">
-                    <h3 className="text-xl font-semibold text-[#1b1b1e] mb-2">Upcoming Tournaments</h3>
+                    <h3 className="text-xl font-semibold text-[#1b1b1e] mb-2">
+                      Upcoming Tournaments
+                    </h3>
                     <ul className="space-y-3">
-                      {mockTournaments.map(tournament => (
-                        <li key={tournament.id} className="flex flex-col gap-1 border-l-4 border-[#f46036] pl-4">
-                          <span className="font-medium text-[#1b1b1e]">{tournament.name}</span>
-                          <span className="text-sm text-[#6d676e]">{tournament.date} &bull; {tournament.location}</span>
+                      {mockTournaments.map((tournament) => (
+                        <li
+                          key={tournament.id}
+                          className="flex flex-col gap-1 border-l-4 border-[#f46036] pl-4"
+                        >
+                          <span className="font-medium text-[#1b1b1e]">
+                            {tournament.name}
+                          </span>
+                          <span className="text-sm text-[#6d676e]">
+                            {tournament.date} &bull; {tournament.location}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -305,7 +410,10 @@ export default function App() {
               allowedRoles={["user", "scout", "trainer"]}
               userRole={userRole}
             >
-              <PlayerRankings onPlayerClick={handlePlayerClick} userRole={userRole} />
+              <PlayerRankings
+                onPlayerClick={handlePlayerClick}
+                userRole={userRole}
+              />
             </ProtectedRoute>
           }
         />
@@ -360,7 +468,11 @@ export default function App() {
               allowedRoles={["scout"]}
               userRole={userRole}
             >
-              <PlayerRankings onPlayerClick={handlePlayerClick} userRole={userRole} enableSearch />
+              <PlayerRankings
+                onPlayerClick={handlePlayerClick}
+                userRole={userRole}
+                enableSearch
+              />
             </ProtectedRoute>
           }
         />
@@ -372,7 +484,11 @@ export default function App() {
               allowedRoles={["user", "scout", "trainer"]}
               userRole={userRole}
             >
-              <PlayerProfile onBack={() => navigate(-1)} player={selectedPlayer} userRole={userRole} />
+              <PlayerProfile
+                onBack={() => navigate(-1)}
+                player={selectedPlayer}
+                userRole={userRole}
+              />
             </ProtectedRoute>
           }
         />
@@ -419,6 +535,18 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/matches"
+          element={
+            <ProtectedRoute
+              isAuthenticated={isAuthenticated}
+              allowedRoles={["user", "scout"]}
+              userRole={userRole}
+            >
+              <MatchesList />
+            </ProtectedRoute>
+          }
+        ></Route>
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

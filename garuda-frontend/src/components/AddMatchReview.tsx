@@ -1,258 +1,173 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Calendar } from './ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { CalendarIcon, Plus, X } from 'lucide-react';
-import { format } from 'date-fns';
-import { cn } from './ui/utils';
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
-const mockTeams = [
-  "SMA Jakarta Utara",
-  "SMA Bandung Raya", 
-  "SMA Surabaya",
-  "SMA Medan Central",
-  "SMA Yogyakarta",
-  "SMA Denpasar",
-  "SMA Makassar",
-  "SMA Palembang"
+// --- Mock match data ---
+const mockMatches = [
+  {
+    id: 1,
+    date: "2024-06-01",
+    homeTeam: "SMA Jakarta Utara",
+    awayTeam: "SMA Bandung Raya",
+    players: [
+      { id: 1, name: "Ahmad Rizki", team: "SMA Jakarta Utara" },
+      { id: 2, name: "Budi Santoso", team: "SMA Bandung Raya" },
+      { id: 3, name: "Charles Wijaya", team: "SMA Jakarta Utara" },
+      { id: 4, name: "Dani Kurniawan", team: "SMA Bandung Raya" },
+    ],
+    homeScore: 78,
+    awayScore: 65,
+  },
+  {
+    id: 2,
+    date: "2024-06-02",
+    homeTeam: "SMA Surabaya",
+    awayTeam: "SMA Medan Central",
+    players: [
+      { id: 5, name: "Eko Prasetyo", team: "SMA Surabaya" },
+      { id: 6, name: "Fajar Hidayat", team: "SMA Medan Central" },
+      { id: 7, name: "Gilang Saputra", team: "SMA Surabaya" },
+      { id: 8, name: "Hendra Wijaya", team: "SMA Medan Central" },
+    ],
+    homeScore: 82,
+    awayScore: 80,
+  },
 ];
-
-const mockPlayers = [
-  { id: 1, name: "Ahmad Rizki", team: "SMA Jakarta Utara" },
-  { id: 2, name: "Budi Santoso", team: "SMA Bandung Raya" },
-  { id: 3, name: "Charles Wijaya", team: "SMA Surabaya" },
-  { id: 4, name: "Dani Kurniawan", team: "SMA Medan Central" },
-  { id: 5, name: "Eko Prasetyo", team: "SMA Yogyakarta" }
-];
-
-interface PlayerComment {
-  playerId: string;
-  playerName: string;
-  comment: string;
-}
 
 export function AddMatchReview() {
-  const [homeTeam, setHomeTeam] = useState("");
-  const [awayTeam, setAwayTeam] = useState("");
-  const [matchDate, setMatchDate] = useState<Date>();
-  const [matchSummary, setMatchSummary] = useState("");
-  const [playerComments, setPlayerComments] = useState<PlayerComment[]>([]);
-  const [selectedPlayer, setSelectedPlayer] = useState("");
-  const [newComment, setNewComment] = useState("");
-
-  const availablePlayers = mockPlayers.filter(player => 
-    player.team === homeTeam || player.team === awayTeam
+  // State for reviews per match
+  const [reviews, setReviews] = useState(
+    mockMatches.map(() => ({ playerId: "", notes: "", rating: "" }))
   );
+  const [submitted, setSubmitted] = useState(false);
 
-  const addPlayerComment = () => {
-    if (selectedPlayer && newComment.trim()) {
-      const player = availablePlayers.find(p => p.id.toString() === selectedPlayer);
-      if (player) {
-        setPlayerComments([...playerComments, {
-          playerId: selectedPlayer,
-          playerName: player.name,
-          comment: newComment.trim()
-        }]);
-        setSelectedPlayer("");
-        setNewComment("");
-      }
-    }
-  };
-
-  const removePlayerComment = (index: number) => {
-    setPlayerComments(playerComments.filter((_, i) => i !== index));
-  };
-
-  const handleSubmit = () => {
-    console.log("Match review submitted:", {
-      homeTeam,
-      awayTeam,
-      matchDate,
-      matchSummary,
-      playerComments
+  const handleReviewChange = (
+    matchIdx: number,
+    field: string,
+    value: string
+  ) => {
+    setReviews((prev) => {
+      const updated = [...prev];
+      updated[matchIdx] = { ...updated[matchIdx], [field]: value };
+      return updated;
     });
-    // Handle form submission
   };
 
-  const isFormValid = homeTeam && awayTeam && matchDate && matchSummary.trim();
+  const handleSubmit = (matchIdx: number) => {
+    const match = mockMatches[matchIdx];
+    const review = reviews[matchIdx];
+    // Here you would send the review to the backend
+    alert(
+      `Review submitted for ${match.homeTeam} vs ${match.awayTeam} (Player: ${
+        match.players.find((p) => p.id.toString() === review.playerId)?.name ||
+        ""
+      })\nNotes: ${review.notes}\nRating: ${review.rating}`
+    );
+    setSubmitted(true);
+    // Optionally reset the review for this match
+    setReviews((prev) => {
+      const updated = [...prev];
+      updated[matchIdx] = { playerId: "", notes: "", rating: "" };
+      return updated;
+    });
+  };
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-[#fbfffe]">Submit a New Match Review</h1>
-      </div>
-
-      <Card className="bg-[#fbfffe] border-[#6d676e]/20">
-        <CardHeader>
-          <CardTitle className="text-xl text-[#1b1b1e]">Match Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Team Selection */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="home-team" className="text-[#1b1b1e] font-medium">Home Team</Label>
-              <Select value={homeTeam} onValueChange={setHomeTeam}>
-                <SelectTrigger className="bg-white border-[#6d676e]/30">
-                  <SelectValue placeholder="Select home team" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockTeams.map((team) => (
-                    <SelectItem key={team} value={team} disabled={team === awayTeam}>
-                      {team}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+    <div className="p-8 space-y-8">
+      <h1 className="text-3xl font-bold text-[#fbfffe] mb-4">
+        Add Match Reviews
+      </h1>
+      {mockMatches.map((match, idx) => (
+        <Card key={match.id} className="bg-[#fbfffe] border-[#6d676e]/20">
+          <CardHeader>
+            <CardTitle className="text-xl text-[#1b1b1e]">
+              {match.homeTeam} vs {match.awayTeam}{" "}
+              <span className="text-sm text-[#6d676e]">({match.date})</span>
+            </CardTitle>
+            <div className="flex gap-2 items-center mt-1 text-lg font-bold">
+              <span className="text-[#1b1b1e]">{match.homeTeam}</span>
+              <span className="text-[#f46036]">{match.homeScore ?? "-"}</span>
+              <span className="text-[#6d676e]">-</span>
+              <span className="text-[#f46036]">{match.awayScore ?? "-"}</span>
+              <span className="text-[#1b1b1e]">{match.awayTeam}</span>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="away-team" className="text-[#1b1b1e] font-medium">Away Team</Label>
-              <Select value={awayTeam} onValueChange={setAwayTeam}>
-                <SelectTrigger className="bg-white border-[#6d676e]/30">
-                  <SelectValue placeholder="Select away team" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockTeams.map((team) => (
-                    <SelectItem key={team} value={team} disabled={team === homeTeam}>
-                      {team}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Match Date */}
-          <div className="space-y-2">
-            <Label className="text-[#1b1b1e] font-medium">Match Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal bg-white border-[#6d676e]/30",
-                    !matchDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {matchDate ? format(matchDate, "PPP") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={matchDate}
-                  onSelect={setMatchDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Match Summary */}
-          <div className="space-y-2">
-            <Label htmlFor="match-summary" className="text-[#1b1b1e] font-medium">Overall Match Summary</Label>
-            <Textarea
-              id="match-summary"
-              placeholder="Provide an overall summary of the match including key moments, standout performances, and game flow..."
-              value={matchSummary}
-              onChange={(e) => setMatchSummary(e.target.value)}
-              className="min-h-32 bg-white border-[#6d676e]/30 focus:border-[#f46036]"
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Player Comments Section */}
-      <Card className="bg-[#fbfffe] border-[#6d676e]/20">
-        <CardHeader>
-          <CardTitle className="text-xl text-[#1b1b1e]">Individual Player Comments</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Add Player Comment */}
-          <div className="space-y-4 p-4 bg-[#6d676e]/5 rounded-lg">
-            <h4 className="font-medium text-[#1b1b1e]">Add Player Comment</h4>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label className="text-[#1b1b1e] font-medium">Select Player</Label>
-                <Select value={selectedPlayer} onValueChange={setSelectedPlayer}>
+                <Label className="text-[#1b1b1e] font-medium">
+                  Select Player
+                </Label>
+                <Select
+                  value={reviews[idx].playerId}
+                  onValueChange={(val) =>
+                    handleReviewChange(idx, "playerId", val)
+                  }
+                >
                   <SelectTrigger className="bg-white border-[#6d676e]/30">
                     <SelectValue placeholder="Choose a player" />
                   </SelectTrigger>
                   <SelectContent>
-                    {availablePlayers.map((player) => (
-                      <SelectItem 
-                        key={player.id} 
-                        value={player.id.toString()}
-                        disabled={playerComments.some(comment => comment.playerId === player.id.toString())}
-                      >
+                    {match.players.map((player) => (
+                      <SelectItem key={player.id} value={player.id.toString()}>
                         {player.name} ({player.team})
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="md:col-span-2 space-y-2">
-                <Label className="text-[#1b1b1e] font-medium">Comment</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    placeholder="Add specific notes about this player's performance..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    className="bg-white border-[#6d676e]/30"
-                  />
-                  <Button 
-                    onClick={addPlayerComment}
-                    disabled={!selectedPlayer || !newComment.trim()}
-                    className="bg-[#f46036] hover:bg-[#f46036]/90 text-white"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
+              <div className="space-y-2">
+                <Label className="text-[#1b1b1e] font-medium">Notes</Label>
+                <Input
+                  placeholder="Add notes..."
+                  value={reviews[idx].notes}
+                  onChange={(e) =>
+                    handleReviewChange(idx, "notes", e.target.value)
+                  }
+                  className="bg-white border-[#6d676e]/30"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[#1b1b1e] font-medium">Rating</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={10}
+                  placeholder="1-5"
+                  value={reviews[idx].rating}
+                  onChange={(e) =>
+                    handleReviewChange(idx, "rating", e.target.value)
+                  }
+                  className="bg-white border-[#6d676e]/30"
+                />
               </div>
             </div>
-          </div>
-
-          {/* Player Comments List */}
-          {playerComments.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-medium text-[#1b1b1e]">Player Comments ({playerComments.length})</h4>
-              {playerComments.map((comment, index) => (
-                <div key={index} className="flex items-start justify-between p-3 bg-white border border-[#6d676e]/20 rounded-lg">
-                  <div className="flex-1">
-                    <p className="font-medium text-[#1b1b1e]">{comment.playerName}</p>
-                    <p className="text-sm text-[#6d676e] mt-1">{comment.comment}</p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removePlayerComment(index)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
+            <div className="flex justify-end">
+              <Button
+                onClick={() => handleSubmit(idx)}
+                disabled={
+                  !reviews[idx].playerId ||
+                  !reviews[idx].notes.trim() ||
+                  !reviews[idx].rating
+                }
+                className="bg-[#f46036] hover:bg-[#f46036]/90 text-white"
+              >
+                Submit Review
+              </Button>
             </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Submit Button */}
-      <div className="flex justify-end">
-        <Button 
-          onClick={handleSubmit}
-          disabled={!isFormValid}
-          className="px-8 bg-[#f46036] hover:bg-[#f46036]/90 text-white font-medium"
-        >
-          Publish Review
-        </Button>
-      </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
