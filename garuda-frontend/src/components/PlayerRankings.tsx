@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import apiClient from '../services/apiClient';
 import { Card } from './ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
@@ -122,6 +121,21 @@ export function PlayerRankings({ onPlayerClick, userRole, enableSearch }: Player
   const [selectedRegion, setSelectedRegion] = useState("All Regions");
   const [selectedGender, setSelectedGender] = useState("All Genders");
   const [selectedAge, setSelectedAge] = useState("All Ages");
+  // Always sort players by rating (desc) by default
+  const sortedPlayers = [...players].sort((a, b) => b.rating - a.rating);
+
+  const filteredPlayers = sortedPlayers.filter(player => {
+    const positionMatch = selectedPosition === "All Positions" || player.position === selectedPosition;
+    const regionMatch = selectedRegion === "All Regions" || player.region === selectedRegion;
+    const genderMatch = selectedGender === "All Genders" || player.gender === selectedGender;
+    const ageMatch = selectedAge === "All Ages" || player.age === Number(selectedAge);
+    const searchMatch =
+      !enableSearch ||
+      search.trim() === '' ||
+      player.name.toLowerCase().includes(search.trim().toLowerCase()) ||
+      player.school.toLowerCase().includes(search.trim().toLowerCase());
+    return positionMatch && regionMatch && genderMatch && ageMatch && searchMatch;
+  });
 
   /*
   useEffect(() => {
@@ -141,19 +155,6 @@ export function PlayerRankings({ onPlayerClick, userRole, enableSearch }: Player
     fetchPlayerRankings();
   }, []);
   */
-
-  const filteredPlayers = mockPlayers.filter(player => {
-    const positionMatch = selectedPosition === "All Positions" || player.position === selectedPosition;
-    const regionMatch = selectedRegion === "All Regions" || player.region === selectedRegion;
-    const genderMatch = selectedGender === "All Genders" || player.gender === selectedGender;
-    const ageMatch = selectedAge === "All Ages" || player.age === Number(selectedAge);
-    const searchMatch =
-      !enableSearch ||
-      search.trim() === '' ||
-      player.name.toLowerCase().includes(search.trim().toLowerCase()) ||
-      player.school.toLowerCase().includes(search.trim().toLowerCase());
-    return positionMatch && regionMatch && genderMatch && ageMatch && searchMatch;
-  });
 
   if (loading) return <div className="p-8 text-center text-[#6d676e]">Loading player rankings...</div>;
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
@@ -234,9 +235,11 @@ export function PlayerRankings({ onPlayerClick, userRole, enableSearch }: Player
                 <th className="text-left p-2 sm:p-4 text-xs sm:text-base font-semibold text-[#1b1b1e]">Player</th>
                 <th className="text-left p-2 sm:p-4 text-xs sm:text-base font-semibold text-[#1b1b1e]">School</th>
                 <th className="text-left p-2 sm:p-4 text-xs sm:text-base font-semibold text-[#1b1b1e]">Position</th>
+                <th className="text-left p-2 sm:p-4 text-xs sm:text-base font-semibold text-[#1b1b1e]">
+                  Rating
+                </th>
                 <th className="text-left p-2 sm:p-4 text-xs sm:text-base font-semibold text-[#1b1b1e]">Age</th>
                 <th className="text-left p-2 sm:p-4 text-xs sm:text-base font-semibold text-[#1b1b1e]">Gender</th>
-                <th className="text-left p-2 sm:p-4 text-xs sm:text-base font-semibold text-[#1b1b1e]">Rating</th>
                 <th className="text-left p-2 sm:p-4 text-xs sm:text-base font-semibold text-[#1b1b1e]">Region</th>
               </tr>
             </thead>
@@ -274,8 +277,6 @@ export function PlayerRankings({ onPlayerClick, userRole, enableSearch }: Player
                         {player.position}
                       </Badge>
                     </td>
-                    <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.age}</td>
-                    <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.gender}</td>
                     <td className="p-2 sm:p-4 text-[#1b1b1e] font-medium">
                       {Array.from({ length: 5 }, (_, i) => (
                         <span key={i} style={{ color: i < (player.rating || 3) ? '#f46036' : '#e0e0e0', fontSize: '1.1em', transition: 'color 0.2s' }}>
@@ -283,6 +284,8 @@ export function PlayerRankings({ onPlayerClick, userRole, enableSearch }: Player
                         </span>
                       ))}
                     </td>
+                    <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.age}</td>
+                    <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.gender}</td>
                     <td className="p-2 sm:p-4 text-[#1b1b1e]">{player.region}</td>
                   </tr>
                 ))
