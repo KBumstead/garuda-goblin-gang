@@ -8,6 +8,7 @@ import { TrainingPrograms } from "./components/TrainingPrograms";
 import { Clubs } from "./components/Clubs";
 import { PlayerProfile } from "./components/PlayerProfile";
 import { AddMatchReview } from "./components/AddMatchReview";
+import { Contact } from "./components/Contact";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { DashboardCarousel } from "./components/DashboardCarousel";
 import {
@@ -132,12 +133,6 @@ export default function App() {
       avatar: "https://placehold.co/40x40",
       rating: 90,
     },
-  ];
-  // Add mock data for school rankings and tournaments
-  const mockSchoolRankings = [
-    { id: 1, name: "SMA Jakarta Utara", region: "Jakarta", points: 98 },
-    { id: 2, name: "SMA Bandung Raya", region: "West Java", points: 92 },
-    { id: 3, name: "SMA Surabaya", region: "East Java", points: 89 },
   ];
   const mockTournaments = [
     {
@@ -340,42 +335,6 @@ export default function App() {
                         ))}
                     </ol>
                   </div>
-                  {/* School Rankings Preview */}
-                  <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20 flex flex-col">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-semibold text-[#1b1b1e]">
-                        School Rankings Preview
-                      </h3>
-                      <Button
-                        size="sm"
-                        className="bg-[#f46036] text-white px-3 py-1 rounded-md text-xs font-semibold hover:bg-[#d94e1f]"
-                        onClick={() => handleScreenChange("school-rankings")}
-                      >
-                        View All
-                      </Button>
-                    </div>
-                    <ol className="space-y-3">
-                      {mockSchoolRankings.slice(0, 3).map((school, idx) => (
-                        <li
-                          key={school.id}
-                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#f46036]/10 transition"
-                        >
-                          <span className="w-7 h-7 flex items-center justify-center bg-[#f46036] text-white rounded-full font-bold">
-                            {idx + 1}
-                          </span>
-                          <span className="font-medium text-[#1b1b1e]">
-                            {school.name}
-                          </span>
-                          <Badge className="ml-2 bg-[#f46036]/10 text-[#f46036] px-2 py-0.5 text-xs font-semibold">
-                            {school.region}
-                          </Badge>
-                          <span className="ml-auto text-[#f46036] font-bold">
-                            {school.points} pts
-                          </span>
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
                   {/* Upcoming Tournaments (unchanged) */}
                   <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20">
                     <h3 className="text-xl font-semibold text-[#1b1b1e] mb-2">
@@ -520,6 +479,18 @@ export default function App() {
                   Your scouting reports will appear here...
                 </p>
               </div>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <ProtectedRoute
+              isAuthenticated={isAuthenticated}
+              allowedRoles={["user", "scout", "trainer"]}
+              userRole={userRole}
+            >
+              <Contact />
             </ProtectedRoute>
           }
         />

@@ -109,7 +109,7 @@ export function Layout({
       <div className="flex">
         {/* Sidebar */}
         <div
-          className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-[#1b1b1e] border-r border-[#6d676e]/20 z-20 transition-transform duration-200 ${
+          className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-[#1b1b1e] border-r border-[#6d676e]/20 z-20 transition-transform duration-200 flex flex-col ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0`}
         >
@@ -152,7 +152,7 @@ export function Layout({
             </div>
           </div>
           {/* Navigation */}
-          <nav className="p-4">
+          <nav className="p-4 flex-1">
             <ul className="space-y-2">
               {menuItems.map((item) => {
                 const Icon = item.icon;
@@ -178,6 +178,25 @@ export function Layout({
               })}
             </ul>
           </nav>
+          
+          {/* Contact Us Section */}
+          <div className="p-4 border-t border-[#6d676e]/20">
+            <button
+              onClick={() => {
+                onScreenChange("contact");
+                if (isMobile) setSidebarOpen(false);
+              }}
+              className={cn(
+                "w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all",
+                activeScreen === "contact"
+                  ? "bg-[#f46036] text-white"
+                  : "text-[#6d676e] hover:text-[#fbfffe] hover:bg-[#6d676e]/10"
+              )}
+            >
+              <UserPlus className="w-5 h-5" />
+              <span className="font-medium">Contact Us</span>
+            </button>
+          </div>
         </div>
         {/* Overlay for mobile sidebar */}
         {isMobile && sidebarOpen && (
