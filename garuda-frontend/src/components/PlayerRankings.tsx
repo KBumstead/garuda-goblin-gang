@@ -1,102 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import apiClient from '../services/apiClient';
 import { Card } from './ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
-const mockPlayers = [
+// Remove mockPlayers
+// export const mockPlayers = [ ... ];
+// Temporary mock data for testing while API is not ready
+const mockPlayers: Player[] = [
   {
     id: 1,
-    rank: 1,
     name: "Ahmad Rizki",
     school: "SMA Jakarta Utara",
     position: "Point Guard",
-    ppg: 18.5,
-    region: "Jakarta",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     rating: 5,
     age: 17,
-    gender: "Male"
+    gender: "Male",
+    region: "Jakarta",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
   },
   {
     id: 2,
-    rank: 2,
     name: "Budi Santoso",
     school: "SMA Bandung Raya",
     position: "Shooting Guard",
-    ppg: 16.8,
-    region: "West Java",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
     rating: 4,
     age: 18,
-    gender: "Male"
+    gender: "Male",
+    region: "West Java",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
   },
   {
     id: 3,
-    rank: 3,
     name: "Charles Wijaya",
     school: "SMA Surabaya",
     position: "Small Forward",
-    ppg: 15.2,
-    region: "East Java",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
     rating: 3,
     age: 17,
-    gender: "Male"
+    gender: "Male",
+    region: "East Java",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
   },
   {
     id: 4,
-    rank: 4,
     name: "Dani Kurniawan",
     school: "SMA Medan Central",
     position: "Power Forward",
-    ppg: 14.9,
-    region: "North Sumatra",
-    avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face",
     rating: 2,
     age: 16,
-    gender: "Male"
+    gender: "Male",
+    region: "North Sumatra",
+    avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face",
   },
   {
     id: 5,
-    rank: 5,
     name: "Eko Prasetyo",
     school: "SMA Yogyakarta",
     position: "Center",
-    ppg: 13.7,
-    region: "Central Java",
-    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f2d?w=150&h=150&fit=crop&crop=face",
     rating: 1,
     age: 18,
-    gender: "Male"
+    gender: "Male",
+    region: "Central Java",
+    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f2d?w=150&h=150&fit=crop&crop=face",
   },
   {
     id: 6,
-    rank: 6,
     name: "Siti Rahma",
     school: "SMA Jakarta Selatan",
     position: "Shooting Guard",
-    ppg: 15.0,
-    region: "Jakarta",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
     rating: 4,
     age: 17,
-    gender: "Female"
+    gender: "Female",
+    region: "Jakarta",
+    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
   },
   {
     id: 7,
-    rank: 7,
     name: "Maya Putri",
     school: "SMA Bandung Barat",
     position: "Point Guard",
-    ppg: 14.2,
-    region: "West Java",
-    avatar: "https://randomuser.me/api/portraits/women/45.jpg",
     rating: 3,
     age: 16,
-    gender: "Female"
-  }
+    gender: "Female",
+    region: "West Java",
+    avatar: "https://randomuser.me/api/portraits/women/45.jpg",
+  },
 ];
 
 const positions = ["All Positions", "Point Guard", "Shooting Guard", "Small Forward", "Power Forward", "Center"];
@@ -104,18 +94,53 @@ const regions = ["All Regions", "Jakarta", "West Java", "East Java", "Central Ja
 const genders = ["All Genders", "Male", "Female"];
 const ages = ["All Ages", "16", "17", "18"];
 
+interface Player {
+  id: number;
+  rank?: number;
+  name: string;
+  school: string;
+  position: string;
+  rating: number;
+  age: number;
+  gender: string;
+  region: string;
+  avatar: string;
+}
+
 interface PlayerRankingsProps {
-  onPlayerClick?: (player: typeof mockPlayers[0]) => void;
+  onPlayerClick?: (player: Player) => void;
   userRole?: 'user' | 'scout' | 'trainer';
   enableSearch?: boolean;
 }
 
 export function PlayerRankings({ onPlayerClick, userRole, enableSearch }: PlayerRankingsProps) {
+  const [players, setPlayers] = useState<Player[]>(mockPlayers);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [selectedPosition, setSelectedPosition] = useState("All Positions");
   const [selectedRegion, setSelectedRegion] = useState("All Regions");
   const [selectedGender, setSelectedGender] = useState("All Genders");
   const [selectedAge, setSelectedAge] = useState("All Ages");
+
+  /*
+  useEffect(() => {
+    const fetchPlayerRankings = async () => {
+      try {
+        setLoading(true);
+        const response = await apiClient.get('/players/rankings');
+        setPlayers(response.data);
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch player rankings.');
+        setPlayers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPlayerRankings();
+  }, []);
+  */
 
   const filteredPlayers = mockPlayers.filter(player => {
     const positionMatch = selectedPosition === "All Positions" || player.position === selectedPosition;
@@ -129,6 +154,9 @@ export function PlayerRankings({ onPlayerClick, userRole, enableSearch }: Player
       player.school.toLowerCase().includes(search.trim().toLowerCase());
     return positionMatch && regionMatch && genderMatch && ageMatch && searchMatch;
   });
+
+  if (loading) return <div className="p-8 text-center text-[#6d676e]">Loading player rankings...</div>;
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
   return (
     <div className="p-8 space-y-6">

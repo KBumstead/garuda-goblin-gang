@@ -11,8 +11,19 @@ function Calendar({
   className,
   classNames,
   showOutsideDays = true,
+  renderDayButton,
   ...props
-}: React.ComponentProps<typeof DayPicker>) {
+}: React.ComponentProps<typeof DayPicker> & { renderDayButton?: (date: Date) => React.ReactNode }) {
+  // Custom DayButton component for custom rendering
+  const DayButton = (dayButtonProps: any) => {
+    const { day } = dayButtonProps;
+    if (renderDayButton) {
+      const custom = renderDayButton(day.date);
+      if (custom && React.isValidElement(custom)) return custom;
+    }
+    // Default rendering
+    return <button {...dayButtonProps} />;
+  };
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -60,12 +71,12 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ className, ...props }) => (
-          <ChevronLeft className={cn("size-4", className)} {...props} />
-        ),
-        IconRight: ({ className, ...props }) => (
-          <ChevronRight className={cn("size-4", className)} {...props} />
-        ),
+        Chevron: ({ className, orientation, ...chevronProps }: { className?: string; orientation?: string }) => {
+          if (orientation === "left") return <ChevronLeft className={cn("size-4", className)} {...chevronProps} />;
+          if (orientation === "right") return <ChevronRight className={cn("size-4", className)} {...chevronProps} />;
+          return <span />;
+        },
+        DayButton,
       }}
       {...props}
     />

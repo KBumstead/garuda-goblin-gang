@@ -37,20 +37,14 @@ export function Login({
 
   return (
     <div className="min-h-screen bg-[#1b1b1e] flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-[#fbfffe] border-[#6d676e]/20">
+      <Card className="w-full max-w-md bg-[#fbfffe] border-[#6d676e]/20 rounded-xl shadow-lg">
         <CardHeader className="text-center pb-2">
           {/* Logo */}
           <div className="flex items-center justify-center space-x-3 mb-6">
-            <div className="w-10 h-10 bg-[#f46036] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">B</span>
-            </div>
-            <span className="text-[#1b1b1e] font-bold text-2xl">PickUps</span>
+            <span className="text-[#f46036] font-extrabold text-3xl tracking-wide">PICKUPs</span>
           </div>
-
           {/* Header */}
-          <h1 className="text-2xl font-bold text-[#1b1b1e] mb-2">
-            Welcome Back
-          </h1>
+          <h1 className="text-2xl font-bold text-[#f46036] mb-2">Welcome Back</h1>
         </CardHeader>
 
         <CardContent>

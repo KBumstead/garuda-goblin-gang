@@ -9,6 +9,11 @@ import { Clubs } from "./components/Clubs";
 import { PlayerProfile } from "./components/PlayerProfile";
 import { AddMatchReview } from "./components/AddMatchReview";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { DashboardCarousel } from "./components/DashboardCarousel";
+import { Popover, PopoverContent, PopoverTrigger } from "./components/ui/popover";
+import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
+import { Badge } from "./components/ui/badge";
+import { Button } from "./components/ui/button";
 
 // Simple Unauthorized page
 const Unauthorized = () => (
@@ -99,6 +104,27 @@ export default function App() {
   const handleForgotPassword = () => {
     alert("Forgot password functionality would be implemented here.");
   };
+  const mockPlayers = [
+    { id: 1, name: 'Budi Santoso', avatar: 'https://placehold.co/40x40', rating: 95 },
+    { id: 2, name: 'Citra Dewi', avatar: 'https://placehold.co/40x40', rating: 92 },
+    { id: 3, name: 'Eka Sari', avatar: 'https://placehold.co/40x40', rating: 90 },
+  ];
+  // Add mock data for school rankings and tournaments
+  const mockSchoolRankings = [
+    { id: 1, name: 'SMA Jakarta Utara', region: 'Jakarta', points: 98 },
+    { id: 2, name: 'SMA Bandung Raya', region: 'West Java', points: 92 },
+    { id: 3, name: 'SMA Surabaya', region: 'East Java', points: 89 },
+  ];
+  const mockTournaments = [
+    { id: 1, name: 'National High School Cup', date: '2024-08-10', location: 'Jakarta' },
+    { id: 2, name: 'Java Regional Qualifier', date: '2024-08-24', location: 'Bandung' },
+    { id: 3, name: 'Sumatra Invitational', date: '2024-09-05', location: 'Medan' },
+  ];
+  // Add mockPrograms for training programs
+  const mockPrograms = [
+    { id: 1, name: "Elite Basketball Camp", date: "2024-08-15", location: "Jakarta", description: "Intensive camp for high school players." },
+    { id: 2, name: "Youth Development Program", date: "2024-09-01", location: "Bandung", description: "Foundational training for ages 13-16." },
+  ];
 
   // Auth routes
   if (!isAuthenticated) {
@@ -129,6 +155,39 @@ export default function App() {
   }
 
   // Main app routes (protected)
+  type CarouselItem = {
+    type: 'Tournament' | 'Training';
+    title: string;
+    organizer: string;
+    image: string;
+  };
+  const carouselItems: CarouselItem[] = [
+    {
+      type: 'Tournament',
+      title: 'Jakarta 3x3 Championship',
+      organizer: 'Perbasi DKI Jakarta',
+      image: 'https://placehold.co/600x400/f46036/fbfffe?text=Tournament',
+    },
+    {
+      type: 'Training',
+      title: 'Elite Guard Training Camp',
+      organizer: 'Coach Andi',
+      image: 'https://placehold.co/600x400/1b1b1e/fbfffe?text=Training',
+    },
+    {
+      type: 'Tournament',
+      title: 'Surabaya High School Cup',
+      organizer: 'DBL Indonesia',
+      image: 'https://placehold.co/600x400/f46036/fbfffe?text=Tournament',
+    },
+    {
+      type: 'Training',
+      title: 'Youth Development Program',
+      organizer: 'Jakarta Basketball Academy',
+      image: 'https://placehold.co/600x400/1b1b1e/fbfffe?text=Training',
+    },
+  ];
+
   return (
     <Layout
       activeScreen={activeScreen}
@@ -146,17 +205,16 @@ export default function App() {
               userRole={userRole}
             >
               <div className="p-8 space-y-6">
+                {/* Feature Carousel */}
+                <DashboardCarousel items={carouselItems} />
+                {/* Slideshow/Carousel */}
+                {/* Remove the old Carousel usage (the div with className="mb-8" containing Carousel, CarouselContent, etc.) */}
                 <div className="flex items-center justify-between">
-                  <h1 className="text-3xl font-bold text-[#fbfffe]">
-                    Welcome to BasketIndo
+                  <h1 className="text-3xl font-bold text-[#f46036]">
+                    Welcome to PICKUPs
                   </h1>
-                  <button
-                    onClick={handleLogout}
-                    className="text-[#6d676e] hover:text-[#f46036] transition-colors"
-                  >
-                    Logout
-                  </button>
                 </div>
+                {/* First row: previous dashboard cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20">
                     <h3 className="text-xl font-semibold text-[#1b1b1e] mb-2">
@@ -182,29 +240,56 @@ export default function App() {
                     <p className="text-[#6d676e] text-sm">Clubs to join</p>
                   </div>
                 </div>
-                <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20">
-                  <h3 className="text-xl font-semibold text-[#1b1b1e] mb-4">
-                    Latest News
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="border-l-4 border-[#f46036] pl-4">
-                      <p className="font-medium text-[#1b1b1e]">
-                        National Basketball Championship 2024 Registration Open
-                      </p>
-                      <p className="text-sm text-[#6d676e]">
-                        Registration for the biggest high school tournament is
-                        now open
-                      </p>
+                {/* Second row: new previews */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Player Rankings Preview */}
+                  <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20 flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-xl font-semibold text-[#1b1b1e]">Player Rankings Preview</h3>
+                      <Button size="sm" className="bg-[#f46036] text-white px-3 py-1 rounded-md text-xs font-semibold hover:bg-[#d94e1f]" onClick={() => handleScreenChange('player-rankings')}>View All</Button>
                     </div>
-                    <div className="border-l-4 border-[#f46036] pl-4">
-                      <p className="font-medium text-[#1b1b1e]">
-                        New Training Facility Opens in Jakarta
-                      </p>
-                      <p className="text-sm text-[#6d676e]">
-                        State-of-the-art basketball training center now
-                        accepting members
-                      </p>
+                    <ol className="space-y-3">
+                      {mockPlayers.slice(0, 3).map((player: typeof mockPlayers[0], idx: number) => (
+                        <li key={player.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#f46036]/10 transition">
+                          <span className="w-7 h-7 flex items-center justify-center bg-[#f46036] text-white rounded-full font-bold">{idx + 1}</span>
+                          <Avatar className="w-8 h-8">
+                            <AvatarImage src={player.avatar} alt={player.name} />
+                            <AvatarFallback>{player.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium text-[#1b1b1e]">{player.name}</span>
+                          <span className="ml-auto text-[#f46036] font-bold">★ {player.rating}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                  {/* School Rankings Preview */}
+                  <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20 flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-xl font-semibold text-[#1b1b1e]">School Rankings Preview</h3>
+                      <Button size="sm" className="bg-[#f46036] text-white px-3 py-1 rounded-md text-xs font-semibold hover:bg-[#d94e1f]" onClick={() => handleScreenChange('school-rankings')}>View All</Button>
                     </div>
+                    <ol className="space-y-3">
+                      {mockSchoolRankings.slice(0, 3).map((school, idx) => (
+                        <li key={school.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#f46036]/10 transition">
+                          <span className="w-7 h-7 flex items-center justify-center bg-[#f46036] text-white rounded-full font-bold">{idx + 1}</span>
+                          <span className="font-medium text-[#1b1b1e]">{school.name}</span>
+                          <Badge className="ml-2 bg-[#f46036]/10 text-[#f46036] px-2 py-0.5 text-xs font-semibold">{school.region}</Badge>
+                          <span className="ml-auto text-[#f46036] font-bold">{school.points} pts</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                  {/* Upcoming Tournaments (unchanged) */}
+                  <div className="bg-[#fbfffe] p-6 rounded-lg border border-[#6d676e]/20">
+                    <h3 className="text-xl font-semibold text-[#1b1b1e] mb-2">Upcoming Tournaments</h3>
+                    <ul className="space-y-3">
+                      {mockTournaments.map(tournament => (
+                        <li key={tournament.id} className="flex flex-col gap-1 border-l-4 border-[#f46036] pl-4">
+                          <span className="font-medium text-[#1b1b1e]">{tournament.name}</span>
+                          <span className="text-sm text-[#6d676e]">{tournament.date} &bull; {tournament.location}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </div>
@@ -219,7 +304,7 @@ export default function App() {
               allowedRoles={["user", "scout", "trainer"]}
               userRole={userRole}
             >
-              <PlayerRankings />
+              <PlayerRankings onPlayerClick={handlePlayerClick} userRole={userRole} />
             </ProtectedRoute>
           }
         />
@@ -232,7 +317,7 @@ export default function App() {
               userRole={userRole}
             >
               <div className="p-8">
-                <h1 className="text-3xl font-bold text-[#fbfffe]">
+                <h1 className="text-3xl font-bold text-[#f46036]">
                   School Rankings
                 </h1>
                 <p className="text-[#6d676e] mt-4">
@@ -250,7 +335,7 @@ export default function App() {
               allowedRoles={["user", "scout", "trainer"]}
               userRole={userRole}
             >
-              <TrainingPrograms />
+              <TrainingPrograms userRole={userRole} />
             </ProtectedRoute>
           }
         />
@@ -274,34 +359,7 @@ export default function App() {
               allowedRoles={["scout"]}
               userRole={userRole}
             >
-              <div className="p-8 space-y-6">
-                <h1 className="text-3xl font-bold text-[#fbfffe]">
-                  Player Database
-                </h1>
-                <div className="bg-[#fbfffe] rounded-lg border border-[#6d676e]/20 p-4">
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        onClick={handlePlayerClick}
-                        className="flex items-center justify-between p-4 border border-[#6d676e]/20 rounded-lg hover:bg-[#6d676e]/5 cursor-pointer transition-colors"
-                      >
-                        <div>
-                          <p className="font-medium text-[#1b1b1e]">
-                            Player {i}
-                          </p>
-                          <p className="text-sm text-[#6d676e]">
-                            SMA Jakarta {i}
-                          </p>
-                        </div>
-                        <button className="text-[#f46036] hover:text-[#f46036]/80">
-                          View Profile
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <PlayerRankings onPlayerClick={handlePlayerClick} userRole={userRole} enableSearch />
             </ProtectedRoute>
           }
         />
@@ -310,10 +368,10 @@ export default function App() {
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}
-              allowedRoles={["scout"]}
+              allowedRoles={["user", "scout", "trainer"]}
               userRole={userRole}
             >
-              <PlayerProfile onBack={() => navigate(-1)} />
+              <PlayerProfile onBack={() => navigate(-1)} player={selectedPlayer} userRole={userRole} />
             </ProtectedRoute>
           }
         />
@@ -338,7 +396,7 @@ export default function App() {
               userRole={userRole}
             >
               <div className="p-8">
-                <h1 className="text-3xl font-bold text-[#fbfffe]">
+                <h1 className="text-3xl font-bold text-[#f46036]">
                   My Reports
                 </h1>
                 <p className="text-[#6d676e] mt-4">
@@ -353,15 +411,10 @@ export default function App() {
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}
-              allowedRoles={["user", "scout"]}
+              allowedRoles={["user", "scout", "trainer"]}
               userRole={userRole}
             >
-              <div className="p-8">
-                <h1 className="text-3xl font-bold text-[#fbfffe]">Profile</h1>
-                <p className="text-[#6d676e] mt-4">
-                  Profile management coming soon...
-                </p>
-              </div>
+              <ProfileManagement userRole={userRole} />
             </ProtectedRoute>
           }
         />

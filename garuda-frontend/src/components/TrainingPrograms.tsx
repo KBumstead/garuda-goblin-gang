@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { MapPin, Calendar, Users, DollarSign, PlusCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from './ui/dialog';
+import { useState } from 'react';
 
 const mockPrograms = [
   {
@@ -99,21 +101,54 @@ interface TrainingProgramsProps {
 }
 
 export function TrainingPrograms({ userRole }: TrainingProgramsProps) {
-  const handleAddProgram = () => {
-    alert('Add Training Program (modal coming soon!)');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [newProgram, setNewProgram] = useState({ name: '', description: '', city: '', price: '', duration: '', level: '', startDate: '' });
+  const handleAddProgram = () => setModalOpen(true);
+  const handleModalClose = () => setModalOpen(false);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setNewProgram({ ...newProgram, [e.target.name]: e.target.value });
+  };
+  const handleSave = () => {
+    // Here you would add the new program to the list (mock for now)
+    setModalOpen(false);
+    alert('Training program added! (mock)');
   };
   return (
     <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <h1 className="text-3xl font-bold text-[#fbfffe]">Training Programs</h1>
         {userRole === 'trainer' && (
-          <Button
-            className="flex items-center gap-2 bg-[#f46036] text-white font-bold px-4 py-2 rounded-lg shadow hover:bg-[#d94e1f] focus:bg-[#d94e1f] focus:outline-none focus:ring-2 focus:ring-[#f46036]/50 transition"
-            onClick={handleAddProgram}
-          >
-            <PlusCircle className="w-5 h-5" />
-            Add Training Program
-          </Button>
+          <>
+            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  className="flex items-center gap-2 bg-[#f46036] text-white font-bold px-4 py-2 rounded-lg shadow hover:bg-[#d94e1f] focus:bg-[#d94e1f] focus:outline-none focus:ring-2 focus:ring-[#f46036]/50 transition"
+                  onClick={handleAddProgram}
+                >
+                  <PlusCircle className="w-5 h-5" />
+                  Add Training Program
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-[#fbfffe] rounded-xl">
+                <DialogHeader>
+                  <DialogTitle className="text-[#f46036]">Add Training Program</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <input name="name" value={newProgram.name} onChange={handleInputChange} placeholder="Program Name" className="w-full px-3 py-2 rounded border border-[#6d676e]/30 focus:border-[#f46036] focus:ring-[#f46036] text-[#1b1b1e] bg-white" />
+                  <textarea name="description" value={newProgram.description} onChange={handleInputChange} placeholder="Description" className="w-full px-3 py-2 rounded border border-[#6d676e]/30 focus:border-[#f46036] focus:ring-[#f46036] text-[#1b1b1e] bg-white min-h-[80px]" />
+                  <input name="city" value={newProgram.city} onChange={handleInputChange} placeholder="City" className="w-full px-3 py-2 rounded border border-[#6d676e]/30 focus:border-[#f46036] focus:ring-[#f46036] text-[#1b1b1e] bg-white" />
+                  <input name="price" value={newProgram.price} onChange={handleInputChange} placeholder="Price" className="w-full px-3 py-2 rounded border border-[#6d676e]/30 focus:border-[#f46036] focus:ring-[#f46036] text-[#1b1b1e] bg-white" />
+                  <input name="duration" value={newProgram.duration} onChange={handleInputChange} placeholder="Duration" className="w-full px-3 py-2 rounded border border-[#6d676e]/30 focus:border-[#f46036] focus:ring-[#f46036] text-[#1b1b1e] bg-white" />
+                  <input name="level" value={newProgram.level} onChange={handleInputChange} placeholder="Level" className="w-full px-3 py-2 rounded border border-[#6d676e]/30 focus:border-[#f46036] focus:ring-[#f46036] text-[#1b1b1e] bg-white" />
+                  <input name="startDate" value={newProgram.startDate} onChange={handleInputChange} placeholder="Start Date" className="w-full px-3 py-2 rounded border border-[#6d676e]/30 focus:border-[#f46036] focus:ring-[#f46036] text-[#1b1b1e] bg-white" />
+                </div>
+                <DialogFooter>
+                  <Button className="bg-[#f46036] text-white font-bold px-4 py-2 rounded-lg hover:bg-[#d94e1f]" onClick={handleSave}>Save</Button>
+                  <Button variant="outline" className="px-4 py-2 rounded-lg" onClick={handleModalClose}>Cancel</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
         )}
       </div>
 
