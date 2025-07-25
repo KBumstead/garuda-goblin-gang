@@ -95,4 +95,38 @@ export async function switchUserRole(newRole: 'user' | 'scout' | 'trainer') {
     throw new Error(error.message || "Failed to switch user role");
   }
   return response.json();
+}
+
+// Fetch all training programs
+export async function fetchTrainingPrograms() {
+  const response = await fetch('http://localhost:8000/api/training-programs', {
+    method: 'GET',
+    headers: { 'Accept': 'application/json' },
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch training programs');
+  }
+  const data = await response.json();
+  // If paginated, return data.data, else return data
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.data)) return data.data;
+  return [];
+}
+
+// Fetch all clubs
+export async function fetchClubs() {
+  const response = await fetch('http://localhost:8000/api/clubs', {
+    method: 'GET',
+    headers: { 'Accept': 'application/json' },
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch clubs');
+  }
+  const data = await response.json();
+  // If paginated, return data.data, else return data
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.data)) return data.data;
+  return [];
 } 

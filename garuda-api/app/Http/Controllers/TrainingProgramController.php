@@ -54,6 +54,8 @@ class TrainingProgramController extends Controller
             'skill_level' => 'required|string',
             'age_range' => 'nullable|string',
             'cost' => 'nullable|numeric',
+            'participant' => 'nullable|integer',
+            'city' => 'nullable|string',
         ]);
         $program = TrainingProgram::create([
             'trainer_id' => $trainer ? $trainer->trainer_id : $request->input('trainer_id'),
@@ -62,6 +64,8 @@ class TrainingProgramController extends Controller
             'skill_level' => $request->skill_level,
             'age_range' => $request->age_range,
             'cost' => $request->cost,
+            'participant' => $request->participant,
+            'city' => $request->city,
         ]);
         return response()->json($program, 201);
     }
@@ -81,8 +85,10 @@ class TrainingProgramController extends Controller
             'skill_level' => 'sometimes|required|string',
             'age_range' => 'nullable|string',
             'cost' => 'nullable|numeric',
+            'participant' => 'nullable|integer',
+            'city' => 'nullable|string',
         ]);
-        $program->update($request->only(['title', 'description', 'skill_level', 'age_range', 'cost']));
+        $program->update($request->only(['title', 'description', 'skill_level', 'age_range', 'cost', 'participant', 'city']));
         return response()->json($program);
     }
 

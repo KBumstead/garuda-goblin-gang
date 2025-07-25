@@ -24,6 +24,8 @@ class TrainingProgram extends Model
         'skill_level',
         'age_range',
         'cost',
+        'participant',
+        'city',
     ];
 
     public function trainer()
