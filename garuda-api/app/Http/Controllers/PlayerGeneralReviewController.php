@@ -54,7 +54,7 @@ class PlayerGeneralReviewController extends Controller
     {
         $user = Auth::user();
         $review = PlayerGeneralReview::findOrFail($id);
-        if ($user->user_id !== $review->user_id && !$this->isAdmin($user)) {
+        if ($user->user_id !== $review->user_id && !$this->authorizeMediaOrAdmin($user)) {
             abort(403, 'Forbidden');
         }
         $request->validate([
@@ -92,8 +92,8 @@ class PlayerGeneralReviewController extends Controller
 
     protected function authorizeMediaOrAdmin($user)
     {
-        if (!$user || (!$user->roles()->where('role_name', 'media')->exists() && !$this->isAdmin($user))) {
-            abort(403, 'Media or admin only.');
+        if (!$user || (!$user->roles()->where('role_name', 'scout')->exists() && !$this->isAdmin($user))) {
+            abort(403, 'Scout or admin only.');
         }
     }
 
