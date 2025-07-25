@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -7,67 +7,56 @@ import { Textarea } from './ui/textarea';
 import { Slider } from './ui/slider';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { ArrowLeft, Star, Calendar, MapPin } from 'lucide-react';
-
-const mockPlayer = {
-  id: 1,
-  name: "Ahmad Rizki",
-  school: "SMA Jakarta Utara",
-  position: "Point Guard",
-  height: "175 cm",
-  weight: "68 kg",
-  age: 17,
-  avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
-  stats: {
-    ppg: 18.5,
-    apg: 7.2,
-    rpg: 4.1,
-    fg: "45.2%",
-    threept: "38.7%",
-    ft: "82.1%"
-  },
-  matchHistory: [
-    {
-      id: 1,
-      date: "2024-07-15",
-      opponent: "SMA Bandung",
-      score: "78-65",
-      performance: "24 pts, 8 ast, 5 reb"
-    },
-    {
-      id: 2,
-      date: "2024-07-10",
-      opponent: "SMA Surabaya",
-      score: "82-79",
-      performance: "19 pts, 6 ast, 3 reb"
-    },
-    {
-      id: 3,
-      date: "2024-07-05",
-      opponent: "SMA Medan",
-      score: "91-88",
-      performance: "22 pts, 9 ast, 4 reb"
-    }
-  ]
-};
+import { fetchPlayerById } from '../services/apiClient';
+import { useParams } from 'react-router';
 
 interface PlayerProfileProps {
   onBack: () => void;
-  player?: any;
+  player?: any; // If provided, use this, else fetch by id
   userRole?: 'user' | 'scout' | 'trainer';
 }
 
 export function PlayerProfile({ onBack, player, userRole }: PlayerProfileProps) {
+  const playerId = useParams().id || '';
   const [scoutNotes, setScoutNotes] = useState("");
-  // Use a 1-5 star rating system
   const [playerRating, setPlayerRating] = useState([player?.rating || 3]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [fetchedPlayer, setFetchedPlayer] = useState<any>(null);
 
-  // Use the passed player or fallback to mockPlayer
-  const p = player || mockPlayer;
+  // If player prop is provided, use it; else fetch by id (assume player?.id or player?.player_id)
+  // useEffect(() => {
+  //   if (player) {
+  //     setFetchedPlayer(player);
+  //     return;
+  //   }
+  //   // If no player prop, try to fetch by id from route param or fallback
+  //   // For now, assume player prop is always provided, or you can add route param logic here
+  // }, [player]);
+
+  // If you want to always fetch from backend (even if player prop is provided), use this:
+  useEffect(() => {
+    setLoading(true);
+    fetchPlayerById(playerId)
+      .then((data) => {
+        setFetchedPlayer(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Failed to fetch player data');
+        setLoading(false);
+      });
+  }, [player]);
+
+  const p = fetchedPlayer || player;
 
   const handleSubmitReview = () => {
     console.log("Review submitted:", { scoutNotes, playerRank: playerRating[0] });
     // Handle review submission
   };
+
+  if (loading) return <div className="p-8 text-center text-[#6d676e]">Loading player profile...</div>;
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
   return (
     <div className="p-8 space-y-6">
@@ -89,57 +78,48 @@ export function PlayerProfile({ onBack, player, userRole }: PlayerProfileProps) 
           <Card className="bg-[#fbfffe] border-[#6d676e]/20 rounded-xl shadow-sm hover:shadow-lg transition-shadow">
             <CardHeader className="text-center">
               <Avatar className="w-32 h-32 mx-auto">
-                <AvatarImage src={p.avatar} alt={p.name} />
-                <AvatarFallback className="text-2xl">{p.name?.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
+                <AvatarImage src={p?.user?.profile_picture_url || ''} alt={p?.user?.full_name || ''} />
+                <AvatarFallback className="text-2xl">{p?.user?.full_name?.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
               </Avatar>
-              <CardTitle className="text-2xl text-[#1b1b1e]">{p.name}</CardTitle>
-              <p className="text-[#6d676e]">{p.school}</p>
+              <CardTitle className="text-2xl text-[#1b1b1e]">{p?.user?.full_name || ''}</CardTitle>
+              <p className="text-[#6d676e]">{p?.school?.name || ''}</p>
               <Badge className="mx-auto bg-[#f46036]/10 text-[#f46036]">
-                {p.position}
+                {p?.position || ''}
               </Badge>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <p className="text-2xl font-bold text-[#1b1b1e]">{p.height}</p>
+                  <p className="text-2xl font-bold text-[#1b1b1e]">{p?.height_cm ? `${p.height_cm} cm` : '-'}</p>
                   <p className="text-sm text-[#6d676e]">Height</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-[#1b1b1e]">{p.weight}</p>
+                  <p className="text-2xl font-bold text-[#1b1b1e]">{p?.weight_kg ? `${p.weight_kg} kg` : '-'}</p>
                   <p className="text-sm text-[#6d676e]">Weight</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-[#1b1b1e]">{p.age}</p>
+                  <p className="text-2xl font-bold text-[#1b1b1e]">{p?.user?.age || '-'}</p>
                   <p className="text-sm text-[#6d676e]">Age</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-[#1b1b1e]">{p.stats?.ppg}</p>
-                  <p className="text-sm text-[#6d676e]">PPG</p>
+                  <p className="text-2xl font-bold text-[#1b1b1e]">{p?.user?.gender || '-'}</p>
+                  <p className="text-sm text-[#6d676e]">Gender</p>
                 </div>
               </div>
+
+              {p?.user?.bio && (
+                <div className="border-t pt-4">
+                  <h4 className="font-semibold text-[#1b1b1e] mb-2">Bio</h4>
+                  <p className="text-[#6d676e] text-sm">{p.user.bio}</p>
+                </div>
+              )}
 
               <div className="border-t pt-4">
                 <h4 className="font-semibold text-[#1b1b1e] mb-3">Season Stats</h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-[#6d676e]">APG:</span>
-                    <span className="font-medium text-[#1b1b1e]">{p.stats?.apg}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#6d676e]">RPG:</span>
-                    <span className="font-medium text-[#1b1b1e]">{p.stats?.rpg}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#6d676e]">FG%:</span>
-                    <span className="font-medium text-[#1b1b1e]">{p.stats?.fg}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#6d676e]">3PT%:</span>
-                    <span className="font-medium text-[#1b1b1e]">{p.stats?.threept}</span>
-                  </div>
+                  {/* TODO: Map real stats if available */}
                   <div className="flex justify-between col-span-2">
-                    <span className="text-[#6d676e]">FT%:</span>
-                    <span className="font-medium text-[#1b1b1e]">{p.stats?.ft}</span>
+                    <span className="text-[#6d676e]">No stats available</span>
                   </div>
                 </div>
               </div>
@@ -203,7 +183,7 @@ export function PlayerProfile({ onBack, player, userRole }: PlayerProfileProps) 
                 )}
               </TabsContent>
               
-              <TabsContent value="history" className="p-6 space-y-6">
+              {/* <TabsContent value="history" className="p-6 space-y-6">
                 <h3 className="text-lg font-semibold text-[#1b1b1e] mb-4">Recent Matches</h3>
                 {p.matchHistory && p.matchHistory.length > 0 ? (
                   <ul className="space-y-4">
@@ -220,7 +200,7 @@ export function PlayerProfile({ onBack, player, userRole }: PlayerProfileProps) 
                 ) : (
                   <div className="text-center text-[#6d676e] py-8 text-lg">No match history available.</div>
                 )}
-              </TabsContent>
+              </TabsContent> */}
             </Tabs>
           </Card>
         </div>

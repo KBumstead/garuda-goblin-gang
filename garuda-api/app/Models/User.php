@@ -26,6 +26,7 @@ class User extends Authenticatable
         'bio',
         'age',
         'gender',
+        'region',
         'height',
     ];
 

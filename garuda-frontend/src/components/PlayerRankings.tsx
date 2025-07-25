@@ -1,92 +1,93 @@
 import React, { useState, useEffect } from 'react';
+import { fetchPlayerRankings } from '../services/apiClient';
 import { Card } from './ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
-// Remove mockPlayers
+// Remove mockPlayers, use backend data
 // export const mockPlayers = [ ... ];
 // Temporary mock data for testing while API is not ready
-const mockPlayers: Player[] = [
-  {
-    id: 1,
-    name: "Ahmad Rizki",
-    school: "SMA Jakarta Utara",
-    position: "Point Guard",
-    rating: 5,
-    age: 17,
-    gender: "Male",
-    region: "Jakarta",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    id: 2,
-    name: "Budi Santoso",
-    school: "SMA Bandung Raya",
-    position: "Shooting Guard",
-    rating: 4,
-    age: 18,
-    gender: "Male",
-    region: "West Java",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    id: 3,
-    name: "Charles Wijaya",
-    school: "SMA Surabaya",
-    position: "Small Forward",
-    rating: 3,
-    age: 17,
-    gender: "Male",
-    region: "East Java",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    id: 4,
-    name: "Dani Kurniawan",
-    school: "SMA Medan Central",
-    position: "Power Forward",
-    rating: 2,
-    age: 16,
-    gender: "Male",
-    region: "North Sumatra",
-    avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    id: 5,
-    name: "Eko Prasetyo",
-    school: "SMA Yogyakarta",
-    position: "Center",
-    rating: 1,
-    age: 18,
-    gender: "Male",
-    region: "Central Java",
-    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f2d?w=150&h=150&fit=crop&crop=face",
-  },
-  {
-    id: 6,
-    name: "Siti Rahma",
-    school: "SMA Jakarta Selatan",
-    position: "Shooting Guard",
-    rating: 4,
-    age: 17,
-    gender: "Female",
-    region: "Jakarta",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-  },
-  {
-    id: 7,
-    name: "Maya Putri",
-    school: "SMA Bandung Barat",
-    position: "Point Guard",
-    rating: 3,
-    age: 16,
-    gender: "Female",
-    region: "West Java",
-    avatar: "https://randomuser.me/api/portraits/women/45.jpg",
-  },
-];
+// const mockPlayers: Player[] = [
+//   {
+//     id: 1,
+//     name: "Ahmad Rizki",
+//     school: "SMA Jakarta Utara",
+//     position: "Point Guard",
+//     rating: 5,
+//     age: 17,
+//     gender: "Male",
+//     region: "Jakarta",
+//     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+//   },
+//   {
+//     id: 2,
+//     name: "Budi Santoso",
+//     school: "SMA Bandung Raya",
+//     position: "Shooting Guard",
+//     rating: 4,
+//     age: 18,
+//     gender: "Male",
+//     region: "West Java",
+//     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+//   },
+//   {
+//     id: 3,
+//     name: "Charles Wijaya",
+//     school: "SMA Surabaya",
+//     position: "Small Forward",
+//     rating: 3,
+//     age: 17,
+//     gender: "Male",
+//     region: "East Java",
+//     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+//   },
+//   {
+//     id: 4,
+//     name: "Dani Kurniawan",
+//     school: "SMA Medan Central",
+//     position: "Power Forward",
+//     rating: 2,
+//     age: 16,
+//     gender: "Male",
+//     region: "North Sumatra",
+//     avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face",
+//   },
+//   {
+//     id: 5,
+//     name: "Eko Prasetyo",
+//     school: "SMA Yogyakarta",
+//     position: "Center",
+//     rating: 1,
+//     age: 18,
+//     gender: "Male",
+//     region: "Central Java",
+//     avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f2d?w=150&h=150&fit=crop&crop=face",
+//   },
+//   {
+//     id: 6,
+//     name: "Siti Rahma",
+//     school: "SMA Jakarta Selatan",
+//     position: "Shooting Guard",
+//     rating: 4,
+//     age: 17,
+//     gender: "Female",
+//     region: "Jakarta",
+//     avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+//   },
+//   {
+//     id: 7,
+//     name: "Maya Putri",
+//     school: "SMA Bandung Barat",
+//     position: "Point Guard",
+//     rating: 3,
+//     age: 16,
+//     gender: "Female",
+//     region: "West Java",
+//     avatar: "https://randomuser.me/api/portraits/women/45.jpg",
+//   },
+// ];
 
 const positions = ["All Positions", "Point Guard", "Shooting Guard", "Small Forward", "Power Forward", "Center"];
 const regions = ["All Regions", "Jakarta", "West Java", "East Java", "Central Java", "North Sumatra"];
@@ -113,17 +114,51 @@ interface PlayerRankingsProps {
 }
 
 export function PlayerRankings({ onPlayerClick, userRole, enableSearch }: PlayerRankingsProps) {
-  const [players, setPlayers] = useState<Player[]>(mockPlayers);
-  const [loading, setLoading] = useState(false);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [selectedPosition, setSelectedPosition] = useState("All Positions");
   const [selectedRegion, setSelectedRegion] = useState("All Regions");
   const [selectedGender, setSelectedGender] = useState("All Genders");
   const [selectedAge, setSelectedAge] = useState("All Ages");
+
+  useEffect(() => {
+    setLoading(true);
+    fetchPlayerRankings({
+      position: selectedPosition,
+      gender: selectedGender,
+      age_min: selectedAge !== 'All Ages' ? Number(selectedAge) : undefined,
+      age_max: selectedAge !== 'All Ages' ? Number(selectedAge) : undefined,
+      per_page: 50,
+    })
+      .then((data) => {
+        console.error(data);
+        // Map backend player fields to frontend Player interface
+        const mapped = data.map((p: any, idx: number) => ({
+          id: p.player_id || p.id || idx,
+          name: p.user?.full_name || p.name || 'Unknown',
+          school: p.school?.name || p.school || 'Unknown',
+          position: p.position || 'Unknown',
+          rating: p.overall_ranking || p.rating || 0,
+          age: p.user?.age || p.age || 0,
+          gender: p.user?.gender || p.gender || 'Unknown',
+          region: p.school?.region || p.region || '',
+          avatar: p.user?.profile_picture_url || '',
+        }));
+        setPlayers(mapped);
+        setLoading(false);
+        setError(null);
+      })
+      .catch((err) => {
+        setError('Failed to fetch player rankings.');
+        setPlayers([]);
+        setLoading(false);
+      });
+  }, [selectedPosition, selectedGender, selectedAge]);
+
   // Always sort players by rating (desc) by default
   const sortedPlayers = [...players].sort((a, b) => b.rating - a.rating);
-
   const filteredPlayers = sortedPlayers.filter(player => {
     const positionMatch = selectedPosition === "All Positions" || player.position === selectedPosition;
     const regionMatch = selectedRegion === "All Regions" || player.region === selectedRegion;

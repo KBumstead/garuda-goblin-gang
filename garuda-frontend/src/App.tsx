@@ -108,7 +108,7 @@ export default function App() {
   const handlePlayerClick = (player: any) => {
     setSelectedPlayer(player);
     setShowPlayerProfile(true);
-    navigate("/player-profile");
+    navigate(`/player-profile/${player.id}`);
   };
 
   const handleForgotPassword = () => {
@@ -436,7 +436,7 @@ export default function App() {
           }
         />
         <Route
-          path="/player-profile"
+          path="/player-profile/:id"
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}

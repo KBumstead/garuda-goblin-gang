@@ -26,9 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::get('/players', [PlayerController::class, 'index']);
+Route::get('/players/ranking', [PlayerController::class, 'ranking']);
 Route::get('/players/{id}', [PlayerController::class, 'show']);
 Route::get('/players/{id}/reviews', [PlayerController::class, 'reviews']);
-Route::get('/players/ranking', [PlayerController::class, 'ranking']);
 
 Route::get('/matches/upcoming', [MatchController::class, 'upcoming']);
 Route::get('/matches', [MatchController::class, 'index']);

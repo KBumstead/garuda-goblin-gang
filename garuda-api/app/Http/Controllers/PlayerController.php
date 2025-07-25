@@ -15,7 +15,7 @@ class PlayerController extends Controller
     // GET /players/{id}
     public function show($id)
     {
-        $player = Player::with(['clubs', 'school', 'generalReviews'])->findOrFail($id);
+        $player = Player::with(['user', 'clubs', 'school', 'generalReviews'])->findOrFail($id);
         $averageRating = $player->generalReviews()->avg('rating');
         $player->average_rating = $averageRating;
         return response()->json($player);
@@ -101,7 +101,7 @@ class PlayerController extends Controller
         return response()->json(['message' => 'Player deleted and role removed.']);
     }
 
-    // GET /players/ranking?age_min=...&age_max=...&position=...
+    // GET /players/ranking?age_min=...&age_max=...&position=...&gender=...
     public function ranking(Request $request)
     {
         $query = \App\Models\Player::query();
@@ -119,10 +119,16 @@ class PlayerController extends Controller
         if ($request->has('position')) {
             $query->where('position', $request->input('position'));
         }
+        // Filter by gender (via user relation, assuming gender is on users table)
+        if ($request->filled('gender')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('gender', $request->input('gender'));
+            });
+        }
         $perPage = $request->input('per_page', 10);
-        $players = $query->orderByDesc('overall_ranking')->paginate($perPage);
+        $players = $query->with('user')->orderByDesc('overall_ranking')->paginate($perPage);
         // Hide relations
-        $players->getCollection()->makeHidden(['user', 'school', 'clubs', 'generalReviews', 'matchReviews', 'matchStats', 'programApplications']);
+        // $players->getCollection()->makeHidden(['school', 'clubs', 'generalReviews', 'matchReviews', 'matchStats', 'programApplications']);
         return response()->json($players);
     }
 

@@ -273,3 +273,51 @@ export async function getPlayersForMatch(match_id: string) {
   if (Array.isArray(data.data)) return data.data;
   return [];
 }
+
+// Fetch player rankings with optional filters
+export async function fetchPlayerRankings({
+  age_min,
+  age_max,
+  position,
+  gender,
+  per_page = 50,
+}: {
+  age_min?: number;
+  age_max?: number;
+  position?: string;
+  gender?: string;
+  per_page?: number;
+} = {}) {
+  const params = new URLSearchParams();
+  if (age_min) params.append('age_min', age_min.toString());
+  if (age_max) params.append('age_max', age_max.toString());
+  if (position && position !== 'All Positions') params.append('position', position);
+  if (gender && gender !== 'All Genders') params.append('gender', gender);
+  if (per_page) params.append('per_page', per_page.toString());
+  const url = `http://localhost:8000/api/players/ranking${params.toString() ? `?${params.toString()}` : ''}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch player rankings');
+  }
+  const data = await response.json();
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.data)) return data.data;
+  return [];
+}
+
+// Fetch a player by ID
+export async function fetchPlayerById(playerId: string) {
+  const response = await fetch(`http://localhost:8000/api/players/${playerId}`, {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch player');
+  }
+  return response.json();
+}
