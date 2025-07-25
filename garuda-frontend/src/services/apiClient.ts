@@ -138,6 +138,28 @@ export async function fetchTrainingPrograms() {
   return [];
 }
 
+// Add a new training program
+export async function addTrainingProgram(program: any) {
+  await fetchCsrfCookie(); // Ensure CSRF cookie is set before POST
+  const token = localStorage.getItem("token");
+  const headers = buildHeaders({
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Authorization: `Bearer ${token}`,
+  });
+  const response = await fetch("http://localhost:8000/api/training-programs", {
+    method: "POST",
+    headers,
+    credentials: "include",
+    body: JSON.stringify(program),
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || "Failed to add training program");
+  }
+  return response.json();
+}
+
 // Fetch all clubs
 export async function fetchClubs() {
   const response = await fetch("http://localhost:8000/api/clubs", {
